@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwinCAT.ProductivityTools", "TwinCAT.ProductivityTools\TwinCAT.ProductivityTools.csproj", "{FA021C93-1346-4B79-BDC0-E6ED85348AA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7075D159-864F-486D-8C62-BC064DA05FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7075D159-864F-486D-8C62-BC064DA05FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7075D159-864F-486D-8C62-BC064DA05FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7075D159-864F-486D-8C62-BC064DA05FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA021C93-1346-4B79-BDC0-E6ED85348AA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA021C93-1346-4B79-BDC0-E6ED85348AA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA021C93-1346-4B79-BDC0-E6ED85348AA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA021C93-1346-4B79-BDC0-E6ED85348AA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0316AE9C-CAB4-4E5C-AF0E-D21B6755EB76}
+	EndGlobalSection
+EndGlobal

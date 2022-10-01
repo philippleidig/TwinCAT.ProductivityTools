@@ -161,7 +161,7 @@
 
     <!-- Images-->
     <Bitmaps>
-      <Bitmap guid="guidImages" href=".\Resources\CommandImages.png" usedList="bmpShutdown, bmpRestart, bmpInfo, bmpDownload, bmpRemoteDesktop, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages" href="..\..\Resources\CommandImages.png" usedList="bmpShutdown, bmpRestart, bmpInfo, bmpDownload, bmpRemoteDesktop, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
   

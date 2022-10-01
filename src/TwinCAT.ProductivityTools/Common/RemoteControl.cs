@@ -122,7 +122,7 @@ namespace TwinCAT.Remote
         {
             using (AdsClient client = new AdsClient())
             {
-                await client.ConnectAsync(new AmsAddress(target, AmsPort.SystemService), cancel);
+                client.Connect(new AmsAddress(target, AmsPort.SystemService));
                 await client.WriteControlAsync(AdsState.Stop, 0, cancel);
             }
         }
@@ -147,7 +147,7 @@ namespace TwinCAT.Remote
             var buffer = new Memory<byte>(new byte[16]);
             using (AdsClient client = new AdsClient())
             {
-                await client.ConnectAsync(new AmsAddress(target, AmsPort.SystemService), cancel);
+                client.Connect(new AmsAddress(target, AmsPort.SystemService));
                 var result = await client.ReadAsync(400, 1, buffer, cancel);
                 result.ThrowOnError();
             }
@@ -183,7 +183,7 @@ namespace TwinCAT.Remote
 
             using (AdsClient client = new AdsClient())
             {
-                await client.ConnectAsync(new AmsAddress(target, AmsPort.R0_Realtime), cancel);
+                client.Connect(new AmsAddress(target, AmsPort.R0_Realtime));
                 var result = await client.ReadAsync(0x01, 0x06, buffer, cancel);
                 result.ThrowOnError();
             }
@@ -208,7 +208,7 @@ namespace TwinCAT.Remote
 
             using (AdsClient client = new AdsClient())
             {
-                await client.ConnectAsync(new AmsAddress(target, AmsPort.R0_Realtime), cancel);
+                client.Connect(new AmsAddress(target, AmsPort.R0_Realtime));
                 var result = await client.ReadAsync(0x01, 0x02, buffer, cancel);
                 result.ThrowOnError();
             }

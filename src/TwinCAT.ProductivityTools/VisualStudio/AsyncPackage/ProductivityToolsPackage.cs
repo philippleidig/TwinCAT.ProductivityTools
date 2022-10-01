@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Events;
 using Microsoft.VisualStudio.Shell.Interop;
 using TCatSysManagerLib;
+using TwinCAT.Remote;
+using TwinCAT.Remote.ProductivityTools;
 using VisualStudio.Extension;
 using Task = System.Threading.Tasks.Task;
 

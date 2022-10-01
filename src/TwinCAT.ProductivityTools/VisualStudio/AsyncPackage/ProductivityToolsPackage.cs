@@ -109,8 +109,7 @@ namespace TwinCAT.ProductivityTools
                     this,
                     CommandIds.AboutCommand,
                     PackageGuids.GuidCommandPackageCmdSet,
-                    About,
-                    IsAvailable
+                    About
                 );
         }
 
@@ -253,7 +252,7 @@ namespace TwinCAT.ProductivityTools
         private void About(object sender, EventArgs e)
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            NotificationProvider.ShowInfoMessage(string.Concat("Beckhoff Automation\nInternal use only!\nUnsupported Utility!\nVersion: ", version ), "TwinCAT Productivity Tools");
+            NotificationProvider.ShowInfoMessage(string.Concat("Beckhoff Automation\nUnsupported Utility!\nVersion: ", version ), "TwinCAT Productivity Tools");
         }
 
         private void IsAvailable(object sender, EventArgs e)

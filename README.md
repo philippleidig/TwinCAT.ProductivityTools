@@ -3,6 +3,12 @@ Visual Studio Extension for higher productivity when working with TwinCAT 3.1 fr
 
 ## Installation
 
+
+### TcXaeShell:
+open the generated *.VSIX as archive and copy it´s content to "C:\Program Files (x86)\Beckhoff\TcXaeShell\Common7\IDE\Extensions\ProductivityTools"
+restart TcXaeShell
+
+### Visual Studio:
 1. Execute the TwinCAT.ProductivityTools.vsix file
 2. Select Visual Studio version
 

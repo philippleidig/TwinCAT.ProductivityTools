@@ -11,13 +11,6 @@
       ]
     },
     {
-      "name": "dotnet-format-staged-files",
-      "group": "pre-commit-format",
-      "command": "dotnet",
-      "args": [ "format", "--include", "${staged}" ],
-      "include": [ "**/*.cs" ]
-    },
-    {
       "name": "csharpier-staged-files",
       "group": "pre-commit-format",
       "command": "dotnet",

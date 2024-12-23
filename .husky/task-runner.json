@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "name": "commit-message-linter",
+      "command": "husky",
+      "args": [
+        "exec",
+        ".husky/commit-lint.csx",
+        "--args",
+        "${args}"
+      ]
+    },
+    {
+      "name": "dotnet-format-staged-files",
+      "group": "pre-commit-format",
+      "command": "dotnet",
+      "args": [ "format", "--include", "${staged}" ],
+      "include": [ "**/*.cs" ]
+    },
+    {
+      "name": "csharpier-staged-files",
+      "group": "pre-commit-format",
+      "command": "dotnet",
+      "args": [ "csharpier", "${staged}" ],
+      "include": [ "**/*.cs" ]
+    }
+  ]
+}

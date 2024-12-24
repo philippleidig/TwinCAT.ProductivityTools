@@ -24,15 +24,14 @@ namespace TwinCAT.ProductivityTools.Commands
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{
-			IEnumerable<EnvDTE.Project> projects = await VS.Solutions.GetAllTwinCATProjectsAsync();
+			EnvDTE.Project project = await VS.Solutions.GetActiveTwinCATProjectAsync();
 
-			await VS.Solutions.UnloadAlltwinCATProjectsAsync();
+			//await VS.Solutions.UnloadAlltwinCATProjectsAsync();
 
-			//await projectFreezer.FreezeProjectsAsync(projects);
+			await projectFreezer.FreezeProjectAsync(project);
 
-			await Task.Delay(2000);
+			//await VS.Solutions.LoadAllTwinCATProjectsAsync();
 
-			await VS.Solutions.LoadAllTwinCATProjectsAsync();
 			await VS.Solutions.SaveAsync();
 		}
 	}

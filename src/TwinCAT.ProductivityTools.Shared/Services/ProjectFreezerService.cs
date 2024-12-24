@@ -29,7 +29,7 @@ namespace TwinCAT.ProductivityTools.Services
 
 		public async Task FreezeProjectAsync(EnvDTE.Project project)
 		{
-			if (!(project is TcSysManager))
+			if (!(project.Object is ITcSysManager2))
 			{
 				return;
 			}
@@ -38,7 +38,7 @@ namespace TwinCAT.ProductivityTools.Services
 			tsProjectFile.Element("TcSmProject").Add(new XAttribute("TcVersionFixed", "true"));
 			tsProjectFile.Save(project.FullName);
 
-			ITcSysManager systemManager = project as TcSysManager;
+			ITcSysManager2 systemManager = project.Object as ITcSysManager2;
 			ITcSmTreeItem plcProjectItems = systemManager.LookupTreeItem("TIPC") as ITcSmTreeItem;
 
 			foreach (ITcSmTreeItem plcProjectItem in plcProjectItems)

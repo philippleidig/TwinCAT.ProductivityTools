@@ -48,6 +48,7 @@ namespace TwinCAT.ProductivityTools
         public const int TwinCATIODeviceContextMenuGroup = 0x2250;
         public const int FreezeProjectCommandId = 0x0321;
         public const int OpenLoggedEventsCommandId = 0x0322;
+        public const int UseRelativeNetIdsCommandId = 0x0323;
         public const int TwinCATXaeProjectContextMenuGroup = 0x2350;
         public const int GenerateCamTablePlcCodeCommandId = 0x0422;
         public const int TwinCATNcCamTablesContextMenuGroup = 0x2450;

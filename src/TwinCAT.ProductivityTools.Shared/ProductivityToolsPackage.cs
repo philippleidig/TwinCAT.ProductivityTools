@@ -1,9 +1,14 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.Services;
@@ -36,6 +41,56 @@ namespace TwinCAT.ProductivityTools
 
 			await this.RegisterServicesAsync();
 			await this.RegisterCommandsAsync();
+
+			//jOnSolutionOpened();
+
+			//HideMenuItems();
+		}
+
+		private async void HideMenuItems()
+		{
+			var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+
+			if (mcs != null)
+			{
+				// Command ID aus einer anderen Extension
+				CommandID otherExtensionCommandId = new CommandID(
+					Guid.Parse("74D21311-2AEE-11D1-8BFB-00A0-00A0C90F26F7"),
+					0x3100
+				);
+
+				// Command abrufen und Sichtbarkeit steuern
+				var menuCommand = mcs.FindCommand(otherExtensionCommandId);
+				if (menuCommand != null)
+				{
+					menuCommand.Visible = false; // Command verstecken
+				}
+			}
+		}
+
+		private async void OnSolutionOpened()
+		{
+			var model = new InfoBarModel(
+				new[]
+				{
+					new InfoBarTextSpan("Activate relative AmsNetIDs."),
+					new InfoBarHyperlink("Go to ")
+				},
+				KnownMonikers.SettingsGroupWarning,
+				true
+			);
+
+			InfoBar infoBar = await VS.InfoBar.CreateAsync(model);
+
+			infoBar.ActionItemClicked += (s, e) =>
+			{
+				ThreadHelper.ThrowIfNotOnUIThread();
+				e.InfoBarUIElement.Close();
+
+				// systemManager.EnableUseRelativeNetIds();
+			};
+
+			await infoBar.TryShowInfoBarUIAsync();
 		}
 
 		private async Task RegisterServicesAsync()

@@ -173,6 +173,13 @@
             </Strings>
         </Button>
 
+        <!-- TwinCAT XAE - Context Menu - Use relative NetIds -->
+        <Button guid="ProductivityToolsCmdSet" id="UseRelativeNetIdsCommandId" priority="0x0000" type="Button">
+            <Strings>
+                <ButtonText>Use relative NetIds</ButtonText>
+            </Strings>
+        </Button>
+
         <!-- TwinCAT IO Device - Context Menu - Enable ADS Server -->
         <Button guid="ProductivityToolsCmdSet" id="EnableAdsServerCommandId" priority="0x0000" type="Button">
             <Strings>
@@ -245,6 +252,11 @@
             <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
         </CommandPlacement>
 
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="UseRelativeNetIdsCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
+        </CommandPlacement>
+
+       
         <!-- TwinCAT NC Cam Tables - Context Menu-->
         <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" priority="0x0000">
             <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATNcCamTablesContextMenuId" />
@@ -304,6 +316,7 @@
         <!-- TwinCAT XAE Project - Context Menu -->
         <IDSymbol name="FreezeProjectCommandId" value="0x0321"/>
         <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
+        <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
         <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
 
         <!-- TwinCAT NC Cam Tables - Context Menu -->

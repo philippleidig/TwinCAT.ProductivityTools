@@ -30,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\SetTickCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SavePlcLibraryOnBuildCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\ShutdownCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\UseRelativeNetIdsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\BaseDialogWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DeviceInfo\DeviceInfoView.xaml.cs">
       <DependentUpon>DeviceInfoView.xaml</DependentUpon>
@@ -54,6 +55,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\SolutionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TcSmTreeItemExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TcSysManagerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileFilterProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileSystem.cs" />

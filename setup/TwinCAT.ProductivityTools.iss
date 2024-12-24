@@ -129,7 +129,7 @@ begin
 	  False, False);
 
 	// Add items
-  VisualStudioOptionsPage.Add('TcXawShell (32-bit)');
+  VisualStudioOptionsPage.Add('TcXaeShell (32-bit)');
   if(FileExists('C:\Program Files (x86)\Beckhoff\TcXaeShell\Common7\IDE\TcXaeShell.exe')) then
     VisualStudioOptionsPage.CheckListBox.Checked[0] := true
   else

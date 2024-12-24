@@ -12,6 +12,18 @@ namespace TwinCAT.ProductivityTools.Commands
 	[Command(PackageIds.EnableAdsServerCommandId)]
 	internal class EnableAdsServerCommand : BaseCommand<EnableAdsServerCommand>
 	{
+		protected override void BeforeQueryStatus(EventArgs e)
+		{
+			EnvDTE.DTE dte = VS.GetRequiredService<DTE, DTE>();
+			EnvDTE.ProjectItem selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+
+			if (selectedItem == null || !(selectedItem.Object is ITcSmTreeItem treeItem))
+				return;
+
+			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && treeItem.IsEtherCATMaster();
+			Command.Enabled = treeItem.IsEtherCATMaster();
+		}
+
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

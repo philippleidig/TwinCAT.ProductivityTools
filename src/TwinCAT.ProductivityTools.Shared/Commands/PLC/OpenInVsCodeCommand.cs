@@ -1,74 +1,60 @@
-﻿using System;
+﻿using Community.VisualStudio.Toolkit;
+using EnvDTE;
+using Microsoft.VisualStudio.Shell;
+using System;
 using System.IO;
 using System.Windows.Forms;
-using Community.VisualStudio.Toolkit;
-using EnvDTE;
-using EnvDTE80;
-using Microsoft;
+using TCatSysManagerLib;
+using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.Helpers;
 using TwinCAT.ProductivityTools.Options;
-using static System.Windows.Forms.Design.AxImporter;
+using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
-	internal sealed class OpenVsCodeCommand
+	[Command(PackageIds.OpenInVsCodeCommandId)]
+	internal sealed class OpenVsCodeCommand : BaseCommand<OpenVsCodeCommand>
 	{
-		private void OpenCurrentFileInVs(object sender, EventArgs e)
+		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{
-			try
+			var dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+			var selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+
+			string filePath = selectedItem.Properties.Item("FullPath").Value.ToString();
+
+			if (!(selectedItem?.Object is ITcSmTreeItem treeItem))
 			{
-				var dte = VS.GetRequiredService<DTE, DTE>() as DTE2;
-				Assumes.Present(dte);
-
-				var activeDocument = dte.ActiveDocument;
-
-				if (activeDocument != null)
-				{
-					var path = activeDocument.FullName;
-
-					if (!string.IsNullOrEmpty(path))
-					{
-						OpenVsCode(path);
-					}
-					else
-					{
-						VS.MessageBox.Show("Couldn't resolve the folder");
-					}
-				}
-				else
-				{
-					VS.MessageBox.Show("Couldn't find active document");
-				}
+				return;
 			}
-			catch (Exception ex)
+
+			if (treeItem.IsPlcProjectFolder())
 			{
-				VS.MessageBox.ShowError(ex.Message);
+				await OpenFolderInVsAsync(filePath);
+			}
+			else 
+			{
+				await OpenFileInVsAsync(filePath);
 			}
 		}
 
-		private void OpenFolderInVs(object sender, EventArgs e)
+		private async Task OpenFileInVsAsync(string path)
 		{
-			try
+			if (!File.Exists(path)) 
 			{
-				var dte = VS.GetRequiredService<DTE, DTE>() as DTE2;
-				Assumes.Present(dte);
-
-				//string path = ProjectHelpers.GetSelectedPath(dte, General.Instance.OpenSolutionProjectAsRegularFile);
-				string path = "";
-
-				if (!string.IsNullOrEmpty(path))
-				{
-					OpenVsCode(path);
-				}
-				else
-				{
-					VS.MessageBox.Show("Couldn't resolve the folder");
-				}
+				// await VS.MessageBox.ShowErrorAsync();
 			}
-			catch (Exception ex)
+
+			OpenVsCode(path);
+		}
+
+		private async Task OpenFolderInVsAsync(string path)
+		{
+			if (!Directory.Exists(path))
 			{
-				VS.MessageBox.ShowError(ex.Message);
+				// await VS.MessageBox.ShowErrorAsync();
 			}
+
+			OpenVsCode(path);
 		}
 
 		private void OpenVsCode(string path)

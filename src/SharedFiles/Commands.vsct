@@ -7,6 +7,11 @@
   <Include href="VSGlobals.vsct" />
   <Include href="KnownImageIds.vsct" />
 
+  <!-- <Include href ="..\TwinCAT.ProductivityTools.Shared\Toolbar.vsct"/>       -->
+  <!-- <Include href ="..\TwinCAT.ProductivityTools.Shared\ContextMenu.vsct"/>   -->
+  <!-- <Include href ="..\TwinCAT.ProductivityTools.Shared\Commands.vsct"/>      -->
+  <!-- <Include href ="..\TwinCAT.ProductivityTools.Shared\Symbols.vsct"/>       -->
+
   <Commands package="ProductivityToolsCmdSet">
     
     <!-- Toolbar-->
@@ -41,7 +46,8 @@
         <Parent guid="ProductivityToolsCmdSet" id="Toolbar" />
       </Group>
 
-      <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" priority="0x0000" />
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0000" />
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" priority="0x0000" />
 
       <Group guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" priority="0x0000" />
         
@@ -198,7 +204,7 @@
         </Button>
 
         
-        <!-- TwinCAT PLC - Context Menu - Remove Comments -->
+        <!-- TwinCAT PLC File - Context Menu - Remove Comments -->
         <Button guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0000" type="Button">
             <CommandFlag>DefaultDisabled</CommandFlag>
             <CommandFlag>DefaultInvisible</CommandFlag>
@@ -209,7 +215,7 @@
             </Strings>
         </Button>
 
-        <!-- TwinCAT PLC - Context Menu -  Remove Regions -->
+        <!-- TwinCAT PLC File - Context Menu -  Remove Regions -->
         <Button guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0000" type="Button">
             <CommandFlag>DefaultDisabled</CommandFlag>
             <CommandFlag>DefaultInvisible</CommandFlag>
@@ -218,8 +224,26 @@
             <Strings>
                 <ButtonText>Remove all regions</ButtonText>
             </Strings>
-        </Button>  
-         
+        </Button>
+
+        <!-- TwinCAT PLC Folder - Context Menu - Open in VsCode -->
+        <Button guid="ProductivityToolsCmdSet" id="OpenInVsCodeCommandId" priority="0x0500" type="Button">
+            <Icon guid="ImageCatalogGuid" id="VisualStudioOnline" />
+            <CommandFlag>IconIsMoniker</CommandFlag>
+            <Strings>
+                <ButtonText>Open in Visual Studio Code</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT PLC Folder - Context Menu -  Open in File Explorer -->
+        <Button guid="ProductivityToolsCmdSet" id="OpenInFileExplorerCommandId" priority="0x0500" type="Button">
+            <Icon guid="ImageCatalogGuid" id="Open" />
+            <CommandFlag>IconIsMoniker</CommandFlag>
+            <Strings>
+                <ButtonText>Open in File Explorer</ButtonText>
+            </Strings>
+        </Button>
+
     </Buttons>
 
     <!-- Images-->
@@ -266,17 +290,30 @@
             <Parent guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" />
         </CommandPlacement>
 
-        <!-- TwinCAT PLC Project - Context Menu-->
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" priority="0x0000">
+        <!-- TwinCAT PLC Project File - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0010">
             <Parent guid="TwinCATPlcProjectCmdSet" id="TwinCATPlcFileContextMenuId" />
         </CommandPlacement>
 
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0000">
-            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" />
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0010">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" />
         </CommandPlacement>
 
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0000">
-            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" />
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0010">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" />
+        </CommandPlacement>
+
+        <!-- TwinCAT PLC Project Folder - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" priority="0x0110">
+            <Parent guid="TwinCATPlcProjectCmdSet" id="TwinCATPlcFolderContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="OpenInFileExplorerCommandId" priority="0x0110">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="OpenInVsCodeCommandId" priority="0x0110">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
         </CommandPlacement>
     </CommandPlacements>    
     
@@ -303,25 +340,29 @@
       <IDSymbol name="ToolbarGroup" value="0x1050" />
 
 
-        <!-- TwinCAT PLC - Context Menu -->  
+        <!-- TwinCAT PLC File - Context Menu -->  
       <IDSymbol name="RemoveCommentsCommandId" value="0x0110" />
-      <IDSymbol name="RemoveRegionsCommandId" value="0x0220"/>
-      <IDSymbol name="TwinCATPlcProjectContextMenuGroup" value="0x1250" />
+      <IDSymbol name="RemoveRegionsCommandId" value="0x0120"/>
+      <IDSymbol name="TwinCATPlcFileContextMenuGroup" value="0x1250" />
 
+      <!-- TwinCAT PLC Folder - Context Menu -->
+      <IDSymbol name="OpenInVsCodeCommandId" value="0x0210" />
+      <IDSymbol name="OpenInFileExplorerCommandId" value="0x0220"/>
+      <IDSymbol name="TwinCATPlcFolderContextMenuGroup" value="0x2250" />
 
-        <!-- TwinCAT IO Device - Context Menu -->
-        <IDSymbol name="EnableAdsServerCommandId" value="0x0320"/>
-        <IDSymbol name="TwinCATIODeviceContextMenuGroup" value="0x2250" />
+      <!-- TwinCAT IO Device - Context Menu -->
+      <IDSymbol name="EnableAdsServerCommandId" value="0x0320"/>
+      <IDSymbol name="TwinCATIODeviceContextMenuGroup" value="0x3250" />
 
-        <!-- TwinCAT XAE Project - Context Menu -->
-        <IDSymbol name="FreezeProjectCommandId" value="0x0321"/>
-        <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
-        <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
-        <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
+      <!-- TwinCAT XAE Project - Context Menu -->
+      <IDSymbol name="FreezeProjectCommandId" value="0x0321"/>
+      <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
+      <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
+      <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
 
-        <!-- TwinCAT NC Cam Tables - Context Menu -->
-        <IDSymbol name="GenerateCamTablePlcCodeCommandId" value="0x0422"/>
-        <IDSymbol name="TwinCATNcCamTablesContextMenuGroup" value="0x2450" />
+      <!-- TwinCAT NC Cam Tables - Context Menu -->
+      <IDSymbol name="GenerateCamTablePlcCodeCommandId" value="0x0422"/>
+      <IDSymbol name="TwinCATNcCamTablesContextMenuGroup" value="0x2450" />
 
     </GuidSymbol>
 

@@ -42,10 +42,13 @@ namespace TwinCAT.ProductivityTools
         public const int Toolbar = 0x1000;
         public const int ToolbarGroup = 0x1050;
         public const int RemoveCommentsCommandId = 0x0110;
-        public const int RemoveRegionsCommandId = 0x0220;
-        public const int TwinCATPlcProjectContextMenuGroup = 0x1250;
+        public const int RemoveRegionsCommandId = 0x0120;
+        public const int TwinCATPlcFileContextMenuGroup = 0x1250;
+        public const int OpenInVsCodeCommandId = 0x0210;
+        public const int OpenInFileExplorerCommandId = 0x0220;
+        public const int TwinCATPlcFolderContextMenuGroup = 0x2250;
         public const int EnableAdsServerCommandId = 0x0320;
-        public const int TwinCATIODeviceContextMenuGroup = 0x2250;
+        public const int TwinCATIODeviceContextMenuGroup = 0x3250;
         public const int FreezeProjectCommandId = 0x0321;
         public const int OpenLoggedEventsCommandId = 0x0322;
         public const int UseRelativeNetIdsCommandId = 0x0323;

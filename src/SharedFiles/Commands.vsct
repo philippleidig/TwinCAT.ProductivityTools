@@ -1,0 +1,380 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+    
+  <Include href="VSGlobals.vsct" />
+  <Include href="KnownImageIds.vsct" />
+
+  <Commands package="ProductivityToolsCmdSet">
+    
+    <!-- Toolbar-->
+    <Menus>
+      <Menu guid="ProductivityToolsCmdSet" id="Toolbar" type="Toolbar">
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>TwinCAT Productivity Tools</ButtonText>
+          <CommandName>TwinCAT Productivity Tools</CommandName>
+        </Strings>
+      </Menu>
+
+      <!-- Productivity Tools - Submenu-->
+      <Menu guid="ProductivityToolsCmdSet" id="ProductivityToolsSubmenu" type="Menu" priority="0x0001">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsSubmenuGroup" />
+        <Strings>
+          <ButtonText>TwinCAT Productivity Tools</ButtonText>
+        </Strings>
+      </Menu>    
+    </Menus>
+
+    <!-- Groups -->
+    <Groups>
+      <Group guid="ProductivityToolsCmdSet" id="ProductivityToolsSubmenuGroup" priority="0x0100">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+      </Group>
+      <Group guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" priority="0x0001">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsSubmenu" />
+      </Group>
+      
+      <Group guid="ProductivityToolsCmdSet" id="ToolbarGroup" priority="0x0000">
+        <Parent guid="ProductivityToolsCmdSet" id="Toolbar" />
+      </Group>
+
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0000" />
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" priority="0x0000" />
+
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" priority="0x0000" />
+        
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" priority="0x0000" />
+        
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" priority="0x0000" />
+    </Groups>
+
+
+    <Buttons>
+      <!-- Menu -->
+      
+      <!-- Shutdown -->
+      <Button guid="ProductivityToolsCmdSet" id="ShutdownCommandId" priority="0x0001" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+        <Icon guid="CommandImages" id="ShutdownMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Shutdown</ButtonText>
+        </Strings>
+      </Button>
+      
+      <!-- Restart -->
+      <Button guid="ProductivityToolsCmdSet" id="RestartCommandId" priority="0x0002" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+        <Icon guid="CommandImages" id="RestartMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Reboot</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- Device Info -->
+      <Button guid="ProductivityToolsCmdSet" id="DeviceInfoCommandId" priority="0x0003" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+        <Icon guid="CommandImages" id="DeviceInfoMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Device Info</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- Remote Desktop -->
+      <Button guid="ProductivityToolsCmdSet" id="RemoteDesktopCommandId" priority="0x0004" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+        <Icon guid="CommandImages" id="RemoteDesktopMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Open Remote Desktop</ButtonText>
+        </Strings>
+      </Button>
+      
+      <!-- Realtime Ethernet Compatible Devices -->
+      <Button guid="ProductivityToolsCmdSet" id="RteInstallCommandId" priority="0x0005" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+              <Icon guid="CommandImages" id="DownloadMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Show Realtime Ethernet Compatible Devices</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- Windows Set Tick -->
+      <Button guid="ProductivityToolsCmdSet" id="SetTickCommandId" priority="0x0006" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Windows Set Tick</ButtonText>
+        </Strings>
+      </Button>
+
+
+      <!-- Toolbar -->
+      <!-- Shutdown -->
+      <Button guid="ProductivityToolsCmdSet" id="ShutdownCommandId" priority="0x0100" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ToolbarGroup" />
+              <Icon guid="CommandImages" id="ShutdownMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Shutdown</ButtonText>
+        </Strings>
+      </Button>
+      <!-- Restart -->
+      <Button guid="ProductivityToolsCmdSet" id="RestartCommandId" priority="0x0100" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ToolbarGroup" />
+              <Icon guid="CommandImages" id="RestartMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Reboot</ButtonText>
+        </Strings>
+      </Button>
+      <!-- Remote Desktop -->
+      <Button guid="ProductivityToolsCmdSet" id="RemoteDesktopCommandId" priority="0x0100" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ToolbarGroup" />
+              <Icon guid="CommandImages" id="RemoteDesktopMoniker" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Remote Desktop</ButtonText>
+        </Strings>
+      </Button>
+
+
+        <!-- TwinCAT XAE - Context Menu - Freeze XAE Project -->
+        <Button guid="ProductivityToolsCmdSet" id="FreezeProjectCommandId" priority="0x0000" type="Button">
+            <Strings>
+                <ButtonText>Freeze Project</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT XAE - Context Menu - Open Logged Events ToolWindow -->
+        <Button guid="ProductivityToolsCmdSet" id="OpenLoggedEventsCommandId" priority="0x0000" type="Button">
+            <Strings>
+                <ButtonText>TwinCAT Logged Events</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT XAE - Context Menu - Use relative NetIds -->
+        <Button guid="ProductivityToolsCmdSet" id="UseRelativeNetIdsCommandId" priority="0x0000" type="Button">
+            <Strings>
+                <ButtonText>Use relative NetIds</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT IO Device - Context Menu - Enable ADS Server -->
+        <Button guid="ProductivityToolsCmdSet" id="EnableAdsServerCommandId" priority="0x0000" type="Button">
+            <Strings>
+                <ButtonText>Enable ADS Server</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT NC Cam Tables - Context Menu - Enable ADS Server -->
+        <Button guid="ProductivityToolsCmdSet" id="GenerateCamTablePlcCodeCommandId" priority="0x0000" type="Button">
+            <CommandFlag>DefaultDisabled</CommandFlag>
+            <CommandFlag>DefaultInvisible</CommandFlag>
+            <CommandFlag>DynamicVisibility</CommandFlag>
+            <Strings>
+                <ButtonText>Generate PLC Code</ButtonText>
+            </Strings>
+        </Button>
+
+        
+        <!-- TwinCAT PLC File - Context Menu - Remove Comments -->
+        <Button guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0100" type="Button">
+            <CommandFlag>DefaultDisabled</CommandFlag>
+            <CommandFlag>DefaultInvisible</CommandFlag>
+            <CommandFlag>DynamicVisibility</CommandFlag>
+            <Icon guid="CommandImages" id="SpareMoniker" />
+            <Strings>
+                <ButtonText>Remove all comments</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT PLC File - Context Menu -  Remove Regions -->
+        <Button guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0100" type="Button">
+            <CommandFlag>DefaultDisabled</CommandFlag>
+            <CommandFlag>DefaultInvisible</CommandFlag>
+            <CommandFlag>DynamicVisibility</CommandFlag>
+            <Icon guid="CommandImages" id="SpareMoniker" />
+            <Strings>
+                <ButtonText>Remove all regions</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT PLC Folder - Context Menu - Open in VsCode -->
+        <Button guid="ProductivityToolsCmdSet" id="OpenInVsCodeCommandId" priority="0x175" type="Button">
+            <Icon guid="ImageCatalogGuid" id="VisualStudioOnline" />
+            <CommandFlag>IconIsMoniker</CommandFlag>
+            <Strings>
+                <ButtonText>Open in Visual Studio Code</ButtonText>
+            </Strings>
+        </Button>
+
+        <!-- TwinCAT PLC Folder - Context Menu -  Open in File Explorer -->
+        <Button guid="ProductivityToolsCmdSet" id="OpenInFileExplorerCommandId" priority="0x175" type="Button">
+            <Icon guid="ImageCatalogGuid" id="Open" />
+            <CommandFlag>IconIsMoniker</CommandFlag>
+            <Strings>
+                <ButtonText>Open in File Explorer</ButtonText>
+            </Strings>
+        </Button>
+
+    </Buttons>
+
+    <!-- Images-->
+    <Bitmaps>
+      <Bitmap guid="CommandImages" href="Commands.png" usedList="ShutdownMoniker, RestartMoniker, DeviceInfoMoniker, DownloadMoniker, RemoteDesktopMoniker, SpareMoniker" />
+    </Bitmaps>
+  </Commands>
+
+    <!-- Command Placements-->
+    <CommandPlacements>
+        <!-- TwinCAT IO Device - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" priority="0x0000">
+            <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATIODeviceContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="EnableAdsServerCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" />
+        </CommandPlacement>
+
+        <!-- TwinCAT XAE Project - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" priority="0x0000">
+            <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATXaeProjectContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="FreezeProjectCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="OpenLoggedEventsCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="UseRelativeNetIdsCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
+        </CommandPlacement>
+
+       
+        <!-- TwinCAT NC Cam Tables - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" priority="0x0000">
+            <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATNcCamTablesContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="GenerateCamTablePlcCodeCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" />
+        </CommandPlacement>
+
+        <!-- TwinCAT PLC Project File - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0010">
+            <Parent guid="TwinCATPlcProjectCmdSet" id="TwinCATPlcFileContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0010">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0010">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" />
+        </CommandPlacement>
+
+        <!-- TwinCAT PLC Project Folder - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" priority="0x0110">
+            <Parent guid="TwinCATPlcProjectCmdSet" id="TwinCATPlcFolderContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="OpenInFileExplorerCommandId" priority="0x0110">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="OpenInVsCodeCommandId" priority="0x0110">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
+        </CommandPlacement>
+    </CommandPlacements>    
+    
+  <Symbols>
+    <GuidSymbol name="ProductivityToolsCmdSet" value="{7e8a71c6-214a-40a2-a302-026e804258d4}">
+
+        <!-- Menu Group -->
+        <IDSymbol name="TwinCATProductivityTools" value="0x1020" />
+        <IDSymbol name="TwinCATPlcFileContextMenuGroup" value="0x1250" />
+        <IDSymbol name="TwinCATPlcFolderContextMenuGroup" value="0x2250" />
+        <IDSymbol name="TwinCATNcCamTablesContextMenuGroup" value="0x2450" />
+        <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
+        <IDSymbol name="TwinCATIODeviceContextMenuGroup" value="0x3250" />
+        
+        <IDSymbol name="ProductivityToolsSubmenuGroup" value="0x1200" />
+        <IDSymbol name="ProductivityToolsCommandsGroup" value="0x1201" />
+        <IDSymbol name="ProductivityToolsSubmenu" value="0x1202" />
+
+        <!-- Toolbar -->
+        <IDSymbol name="Toolbar" value="0x1000" />
+        <IDSymbol name="ToolbarGroup" value="0x1050" />
+
+        
+         <!-- Commands -->
+        <IDSymbol name="ShutdownCommandId" value="0x0100" />
+        <IDSymbol name="RestartCommandId" value="0x0101" />
+        <IDSymbol name="DeviceInfoCommandId" value="0x0102" />
+        <IDSymbol name="RemoteDesktopCommandId" value="0x0103" />
+        <IDSymbol name="RteInstallCommandId" value="0x0104" />
+        <IDSymbol name="SetTickCommandId" value="0x0105" />
+        <IDSymbol name="RemoveCommentsCommandId" value="0x0110" />
+        <IDSymbol name="RemoveRegionsCommandId" value="0x0120"/>
+        <IDSymbol name="OpenInVsCodeCommandId" value="0x0210" />
+        <IDSymbol name="OpenInFileExplorerCommandId" value="0x0220"/>
+        <IDSymbol name="EnableAdsServerCommandId" value="0x0320"/>
+        <IDSymbol name="FreezeProjectCommandId" value="0x0321"/>
+        <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
+        <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
+        <IDSymbol name="GenerateCamTablePlcCodeCommandId" value="0x0422"/>
+
+    </GuidSymbol>
+
+    <!-- TwinCAT XAE Command Set -->   
+    <GuidSymbol name="TwinCATXaeProjectCmdSet" value="{40EE08E0-8FB4-46E9-BAAB-100E60019B7B}">
+        <IDSymbol name="TwinCATXaeProjectContextMenuId" value="0x8028" />
+        <IDSymbol name="TwinCATIODeviceContextMenuId" value="0x8004" />
+        <IDSymbol name="TwinCATNcCamTablesContextMenuId" value="0x8025" />
+    </GuidSymbol>
+
+    <!-- TwinCAT PLC Command Set -->
+    <GuidSymbol name="TwinCATPlcProjectCmdSet" value="{3B11520B-7E70-4008-A6CF-B60AE84E12B1}">
+        <IDSymbol name="TwinCATPlcProjectContextMenuId" value="0x9013" />
+        <IDSymbol name="TwinCATPlcFileContextMenuId" value="0x9011" />
+        <IDSymbol name="TwinCATPlcFolderContextMenuId" value="0x9010" />
+        <IDSymbol name="TwinCatPlcCodeEditorContextMenuId" value="0x9017" />
+    </GuidSymbol>  
+
+    <!-- Images -->
+    <GuidSymbol name="CommandImages" value="{5a8761e2-47d4-4be3-abd9-ce2305ef1371}">
+      <IDSymbol name="ShutdownMoniker" value="1" />
+      <IDSymbol name="RestartMoniker" value="2" />
+      <IDSymbol name="DeviceInfoMoniker" value="3" />
+      <IDSymbol name="DownloadMoniker" value="4" />
+      <IDSymbol name="RemoteDesktopMoniker" value="5" />
+      <IDSymbol name="SpareMoniker" value="6" />
+    </GuidSymbol>
+
+  </Symbols>
+</CommandTable>

@@ -1,35 +1,40 @@
+![TwinCAT logo](https://github.com/philippleidig/TwinCAT.ProductivityTools/blob/main/assets/images/TwinCAT.bmp)
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/philippleidig/TwinCAT.ProductivityTools/blob/main/LICENSE)
+[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/philippleidig/TcUnit-VsExtension)
+
 # TwinCAT.ProductivityTools
-Visual Studio Extension for higher productivity when working with TwinCAT 3.1 from Beckhoff
+
+Visual Studio Extension for higher productivity when working with TwinCAT 3.1 from Beckhoff.
+A collection of minor fixes and tweaks for TwinCAT to make you a happier developer.
+
+## Table of Contents
+  - [Installation](#installation)
+  - [Features](#features)
 
 ## Installation
 
+To install the TwinCAT ProductivityTools, follow these steps:
 
-### TcXaeShell:
-open the generated *.VSIX as archive and copy it´s content to "C:\Program Files (x86)\Beckhoff\TcXaeShell\Common7\IDE\Extensions\ProductivityTools"
-restart TcXaeShell
-
-### Visual Studio:
-1. Execute the TwinCAT.ProductivityTools.vsix file
-2. Select Visual Studio version
+1. [Download](https://github.com/philippleidig/TwinCAT.ProductivityTools/releases/latest) the latest installer.
+3. Select the Visual Studio and TcXaeShell versions, which the Extension should be installed for.
+4. Click on "Install".
+5. Follow the on-screen instructions to complete the installation.
 
 ## Features
 
-- Remote Shutdown / Reboot of the selected target
-- Open a RDP connection to the selected target
-- Execute the win8settick.bat on the selected target
-- Remote installation of the TwinCAT real-time driver
-- Reading the device information (TwinCAT, OS, Image, installed TwinCAT Functions, etc.)
+* **General**
+  * [Freeze TwinCAT XAE / PLC project]()
+	
+* **IDE**
+  * [Open in Visual Studio Code]()
+  * [Open in File Explorer]()
 
-## Usage
+* **PLC**
+  * [Remove all comments]()
+  * [Remove all regions]()
 
-![usage screenshot](./docs/resources/usage.png)
-
-![toolbar screenshot](./docs/resources/toolbar.png)
-
-TwinCAT.ProductivityTools uses the selected target of a TwinCAT XAE project Without an open TwinCAT XAE project the buttons are hidden. When starting a VS Solution with a TwinCAT XAE project they are automatically displayed.
-The use of the local target system is deactivated, e.g. to avoid a shutdown of the own operating system.
-
-![local target screenshot](./docs/resources/local.png)
+* **EtherCAT**
+  * [Enable ADS Server]()
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

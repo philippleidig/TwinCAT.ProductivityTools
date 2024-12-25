@@ -1,5 +1,11 @@
+![TwinCAT logo](https://github.com/philippleidig/TwinCAT.ProductivityTools/blob/main/assets/images/TwinCAT.bmp)
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/philippleidig/TwinCAT.ProductivityTools/blob/main/LICENSE)
+[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/philippleidig/TcUnit-VsExtension)
+
 # TwinCAT.ProductivityTools
-Visual Studio Extension for higher productivity when working with TwinCAT 3.1 from Beckhoff
+
+Visual Studio Extension for higher productivity when working with TwinCAT 3.1 from Beckhoff.
+A collection of minor fixes and tweaks for TwinCAT to make you a happier developer.
 
 ## Table of Contents
   - [Installation](#installation)
@@ -16,13 +22,23 @@ To install the TwinCAT ProductivityTools, follow these steps:
 
 ## Features
 
-- Remote Shutdown / Reboot of the selected target
-- Open a RDP connection to the selected target
-- Execute the win8settick.bat on the selected target
-- Remote installation of the TwinCAT real-time driver
-- Reading the device information (TwinCAT, OS, Image, installed TwinCAT Functions, etc.)
-- [Freeze TwinCAT XAE / PLC project](docs/freezeproject.md)
+* **General**
+  * [Clear list of recent files and projects](docs/clearecentlist.md)
+  * [Freeze TwinCAT XAE / PLC project](docs/freezeproject.md)
+	
+* **IDE**
+  * [Open in Visual Studio Code](docs/openinvisualstudiocode.md)
+  * [Open in File Explorer](docs/openinfileexplorer.md)
 
+* **PLC**
+  * [Remove all comments]()
+  * [Remove all regions]()
+
+* **EtherCAT**
+  * [Enable ADS Server](docs/enableadsserver.md)
+
+* **MOTION**
+  * [Generate PLC code from cam table]()
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

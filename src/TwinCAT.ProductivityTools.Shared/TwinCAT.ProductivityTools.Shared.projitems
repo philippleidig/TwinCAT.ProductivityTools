@@ -82,8 +82,4 @@
     <Folder Include="$(MSBuildThisFileDirectory)Commands\IO\" />
     <Folder Include="$(MSBuildThisFileDirectory)Commands\MOTION\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Symbols.vsct" />
-    <None Include="$(MSBuildThisFileDirectory)Toolbar.vsct" />
-  </ItemGroup>
 </Project>

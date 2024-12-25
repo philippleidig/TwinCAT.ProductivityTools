@@ -8,7 +8,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
-	//[Command(PackageGuids.guidProductivityToolsPackageCmdSetString, PackageIds.ShutdownCommandId)]
+	//[Command(PackageIds.SavePlcLibraryOnBuildCommandId)]
 	//internal sealed class SavePlcLibraryOnBuildCommand : BaseCommand<SavePlcLibraryOnBuildCommand>
 	//{
 	//	public SavePlcLibraryOnBuildCommand()

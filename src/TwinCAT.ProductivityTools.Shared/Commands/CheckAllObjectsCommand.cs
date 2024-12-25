@@ -14,13 +14,6 @@ namespace TwinCAT.ProductivityTools.Commands
 	//[Command(PackageIds.CleanProjectCommandId)]
 	internal class CheckAllObjectsCommand : BaseCommand<CheckAllObjectsCommand>
 	{
-		public CheckAllObjectsCommand()
-		{
-			VS.Events.BuildEvents.SolutionBuildDone += OnSolutionBuildDone;
-			;
-			General.Saved += OnOptionsSaved;
-		}
-
 		private async void OnSolutionBuildDone(bool obj)
 		{
 			ITcSysManager2 systemManager =
@@ -30,7 +23,7 @@ namespace TwinCAT.ProductivityTools.Commands
 
 			foreach (ITcSmTreeItem plcProject in plcTreeItem)
 			{
-				ITcProjectRoot projectRoot = (ITcProjectRoot)plcProject;
+				ITcProjectRoot projectRoot = plcProject as ITcProjectRoot;
 				ITcSmTreeItem nestedProject = projectRoot.NestedProject;
 
 				ITcPlcIECProject2 iecProject = nestedProject as ITcPlcIECProject2;
@@ -38,17 +31,28 @@ namespace TwinCAT.ProductivityTools.Commands
 			}
 		}
 
-		private void OnOptionsSaved(General obj)
-		{
-			// get option for auto clean project when Clean SOlution is executed
-		}
-
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
 			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
 			Command.Enabled = true;
+			//Command.Checked = Options.Build.Instance.CheckAllObjectsOnBuild;
 		}
 
-		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e) { }
+		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
+		{
+			//var isChecked = Options.Build.Instance.CheckAllObjectsOnBuild;
+			//Options.Build.Instance.CheckAllObjectsOnBuild = !isChecked;
+			//
+			//await Options.Build.Instance.SaveAsync();
+			//
+			//if (Options.Build.Instance.CheckAllObjectsOnBuild)
+			//{
+			//	VS.Events.BuildEvents.SolutionBuildDone += OnSolutionBuildDone;
+			//}
+			//else
+			//{
+			//	VS.Events.BuildEvents.SolutionBuildDone -= OnSolutionBuildDone;
+			//}
+		}
 	}
 }

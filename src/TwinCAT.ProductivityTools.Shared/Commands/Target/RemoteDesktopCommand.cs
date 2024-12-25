@@ -16,10 +16,13 @@ namespace TwinCAT.ProductivityTools.Commands
 	[Command(PackageIds.RemoteDesktopCommandId)]
 	internal sealed class RemoteDesktopCommand : BaseCommand<RemoteDesktopCommand>
 	{
-		protected override void BeforeQueryStatus(EventArgs e)
+		protected override async void BeforeQueryStatus(EventArgs e)
 		{
+			ITcSysManager2 systemManager =
+				await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
+
 			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = true;
+			Command.Enabled = AmsNetId.Local.ToString() == systemManager.GetTargetNetId();
 		}
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)

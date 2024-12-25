@@ -13,17 +13,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IProjectFreezerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\ITargetSystemService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CheckAllObjectsCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\CleanProjectCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\DeleteBuildArtifactsOnCleanCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\DeviceInfoCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\OpenLoggedEventsCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\FreezeProjectCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\FullRenameCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\OpenLoggedEventsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\FreezeProjectCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\OpenInVsCodeCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\IO\EnableAdsServerCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\MOTION\GenerateNcCamTablePlcCodeCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\OpenInFileExplorerCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\RebootCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\ReleaseProjectCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\RemoteDesktopCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\RemoveCommentsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\RemoveRegionsCommand.cs" />
@@ -31,7 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\SetTickCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SavePlcLibraryOnBuildCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\ShutdownCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\UseRelativeNetIdsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\UseRelativeNetIdsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\BaseDialogWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DeviceInfo\DeviceInfoView.xaml.cs">
       <DependentUpon>DeviceInfoView.xaml</DependentUpon>
@@ -61,6 +59,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileFilterProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\VsCodeDetect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Options\Build.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Options\General.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProductivityToolsPackage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TargetSelectionMonitor.cs" />
@@ -81,5 +80,6 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Commands\IO\" />
     <Folder Include="$(MSBuildThisFileDirectory)Commands\MOTION\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\" />
   </ItemGroup>
 </Project>

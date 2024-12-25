@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Threading;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using TCatSysManagerLib;
 using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Extensions;
-using static System.Windows.Forms.AxHost;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands

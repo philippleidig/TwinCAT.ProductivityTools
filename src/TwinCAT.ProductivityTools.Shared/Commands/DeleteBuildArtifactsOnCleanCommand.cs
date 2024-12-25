@@ -6,41 +6,17 @@ using Microsoft.VisualStudio.Shell;
 using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.Helpers;
 using TwinCAT.ProductivityTools.Options;
+using static System.Windows.Forms.Design.AxImporter;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
-	//[Command(PackageIds.CleanProjectCommandId)]
-	internal class CleanProjectCommand : BaseCommand<CleanProjectCommand>
+	//[Command(PackageIds.DeleteBuildArtifactsOnCleanCommandId)]
+	internal class DeleteBuildArtifactsOnCleanCommand : BaseCommand<DeleteBuildArtifactsOnCleanCommand>
 	{
-		public CleanProjectCommand()
+		private void OnProjectCleanStarted(Project project)
 		{
-			VS.Events.BuildEvents.ProjectCleanDone += OnProjectCleanDone;
-			General.Saved += OnOptionsSaved;
-		}
-
-		private void OnOptionsSaved(General obj)
-		{
-			// get option for auto clean project when Clean SOlution is executed
-		}
-
-		private void OnProjectCleanDone(ProjectBuildDoneEventArgs obj)
-		{
-			throw new NotImplementedException();
-		}
-
-		protected override void BeforeQueryStatus(EventArgs e)
-		{
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = true;
-		}
-
-		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
-		{
-			var dte = await VS.GetRequiredServiceAsync<EnvDTE.DTE, EnvDTE.DTE>();
-
-			string projectFile = dte?.Solution?.FullName;
-			var directory = Path.GetDirectoryName(projectFile);
+			var directory = Path.GetDirectoryName(project.FullPath);
 
 			var fileSystem = new FileSystem();
 			var fileFilter = new FileFilterProvider();
@@ -77,5 +53,29 @@ namespace TwinCAT.ProductivityTools.Commands
 				}
 			}
 		}
+
+		protected override void BeforeQueryStatus(EventArgs e)
+		{
+			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
+			Command.Enabled = true;
+			Command.Checked = Options.Build.Instance.DeleteBuildArtifactsOnClean;
+		}
+
+		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
+		{
+			var isChecked = Options.Build.Instance.DeleteBuildArtifactsOnClean;
+			Options.Build.Instance.DeleteBuildArtifactsOnClean = !isChecked;
+
+			await Options.Build.Instance.SaveAsync();
+
+			if (!isChecked)
+			{
+				VS.Events.BuildEvents.ProjectCleanStarted += OnProjectCleanStarted;
+			} else
+			{
+				VS.Events.BuildEvents.ProjectCleanStarted -= OnProjectCleanStarted;
+			}
+		}
+
 	}
 }

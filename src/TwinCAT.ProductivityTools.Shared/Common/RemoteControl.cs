@@ -1,37 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Community.VisualStudio.Toolkit;
 using TwinCAT.Ads;
 
 namespace TwinCAT.ProductivityTools
 {
 	public static class RemoteControl
 	{
-		public static void StartProcess(AmsNetId target, string path, string dir, string args)
-		{
-			byte[] Data = new byte[777];
-
-			BitConverter.GetBytes(path.Length).CopyTo(Data, 0);
-			BitConverter.GetBytes(dir.Length).CopyTo(Data, 4);
-			BitConverter.GetBytes(args.Length).CopyTo(Data, 8);
-
-			System.Text.Encoding.ASCII.GetBytes(path).CopyTo(Data, 12);
-			System.Text.Encoding.ASCII.GetBytes(dir).CopyTo(Data, 12 + path.Length + 1);
-			System
-				.Text.Encoding.ASCII.GetBytes(args)
-				.CopyTo(Data, 12 + path.Length + 1 + dir.Length + 1);
-
-			ReadOnlyMemory<byte> buffer = new ReadOnlyMemory<byte>(Data);
-
-			using (AdsClient client = new AdsClient())
-			{
-				client.Connect(new AmsAddress(target, AmsPort.SystemService));
-				client.Write(500, 0, buffer);
-				client.Dispose();
-			}
-		}
-
 		public static async Task StartProcessAsync(
 			AmsNetId target,
 			string path,
@@ -62,15 +37,6 @@ namespace TwinCAT.ProductivityTools
 			}
 		}
 
-		public static void Shutdown(AmsNetId target)
-		{
-			using (AdsClient client = new AdsClient())
-			{
-				client.Connect(new AmsAddress(target, AmsPort.SystemService));
-				client.WriteControl(new StateInfo(AdsState.Shutdown, 0));
-			}
-		}
-
 		public static async Task ShutdownAsync(AmsNetId target, CancellationToken cancel)
 		{
 			using (AdsClient client = new AdsClient())
@@ -78,15 +44,6 @@ namespace TwinCAT.ProductivityTools
 				client.Connect(new AmsAddress(target, AmsPort.SystemService));
 				var res = await client.WriteControlAsync(AdsState.Shutdown, 0, cancel);
 				res.ThrowOnError();
-			}
-		}
-
-		public static void Reboot(AmsNetId target)
-		{
-			using (AdsClient client = new AdsClient())
-			{
-				client.Connect(new AmsAddress(target, AmsPort.SystemService));
-				client.WriteControl(new StateInfo(AdsState.Shutdown, 1));
 			}
 		}
 
@@ -129,9 +86,13 @@ namespace TwinCAT.ProductivityTools
 			{
 				client.Connect(new AmsAddress(target, AmsPort.SystemService));
 
-				var result = client.Read(700, 1, buffer.AsMemory());
-
-				//  result.ThrowOnError();
+				var result = await client.ReadAsync(
+					700,
+					1,
+					buffer.AsMemory(),
+					CancellationToken.None
+				);
+				result.ThrowOnError();
 
 				String data = System.Text.Encoding.ASCII.GetString(buffer);
 

@@ -2,6 +2,7 @@
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
+using TCatSysManagerLib;
 using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
@@ -14,15 +15,13 @@ namespace TwinCAT.ProductivityTools.Commands
 	{
 		private ITargetSystemService targetSystemService;
 
-		protected override void BeforeQueryStatus(EventArgs e)
+		protected override async void BeforeQueryStatus(EventArgs e)
 		{
-			targetSystemService = VS.GetRequiredService<
-				ITargetSystemService,
-				ITargetSystemService
-			>();
+			ITcSysManager2 systemManager =
+				await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
 
 			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = !targetSystemService.ActiveTargetSystem.IsLocal;
+			Command.Enabled = AmsNetId.Local.ToString() == systemManager.GetTargetNetId();
 		}
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)

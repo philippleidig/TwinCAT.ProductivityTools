@@ -23,22 +23,18 @@ To install the TwinCAT ProductivityTools, follow these steps:
 ## Features
 
 * **General**
-  * [Clear list of recent files and projects](docs/clearecentlist.md)
-  * [Freeze TwinCAT XAE / PLC project](docs/freezeproject.md)
+  * [Freeze TwinCAT XAE / PLC project]()
 	
 * **IDE**
-  * [Open in Visual Studio Code](docs/openinvisualstudiocode.md)
-  * [Open in File Explorer](docs/openinfileexplorer.md)
+  * [Open in Visual Studio Code]()
+  * [Open in File Explorer]()
 
 * **PLC**
   * [Remove all comments]()
   * [Remove all regions]()
 
 * **EtherCAT**
-  * [Enable ADS Server](docs/enableadsserver.md)
-
-* **MOTION**
-  * [Generate PLC code from cam table]()
+  * [Enable ADS Server]()
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

@@ -69,8 +69,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Options\General.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProductivityToolsPackage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TargetSelectionMonitor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)QuickInfo\LineAsyncQuickInfoProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)QuickInfo\LineAsyncQuickInfoSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\OutputWindowPane.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TargetSystemService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\ProjectFreezerService.cs" />

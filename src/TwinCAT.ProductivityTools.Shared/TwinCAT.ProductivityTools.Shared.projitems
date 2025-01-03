@@ -12,9 +12,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IOutputWindowPane.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IProjectFreezerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\ITargetSystemService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Abstractions\ITwinCATEventListenerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CellTemplateDataGrid.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CheckAllObjectsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\DeleteBuildArtifactsOnCleanCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\DeviceInfoCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\IO\ShowIOMappingToolWindowCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\OpenLoggedEventsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\FreezeProjectCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\OpenInVsCodeCommand.cs" />
@@ -30,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SavePlcLibraryOnBuildCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\ShutdownCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\UseRelativeNetIdsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\EventMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\BaseDialogWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DeviceInfo\DeviceInfoView.xaml.cs">
       <DependentUpon>DeviceInfoView.xaml</DependentUpon>
@@ -59,13 +63,25 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileFilterProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\VsCodeDetect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InfoBars\BaseInfoBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InfoBars\UseRelativeNetIdsInfoBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Options\Build.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Options\General.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProductivityToolsPackage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TargetSelectionMonitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)QuickInfo\LineAsyncQuickInfoProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)QuickInfo\LineAsyncQuickInfoSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\OutputWindowPane.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TargetSystemService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\ProjectFreezerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\TwinCATEventListenerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingToolWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingToolWindowControl.xaml.cs">
+      <DependentUpon>IOMappingToolWindowControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TreeListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TreeListViewExpander.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Dialogs\DeviceInfo\DeviceInfoView.xaml">
@@ -76,10 +92,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingToolWindowControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Commands\IO\" />
     <Folder Include="$(MSBuildThisFileDirectory)Commands\MOTION\" />
     <Folder Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Controls\" />
   </ItemGroup>
 </Project>

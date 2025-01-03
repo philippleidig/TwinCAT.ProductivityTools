@@ -56,7 +56,9 @@ namespace TwinCAT.ProductivityTools.Commands
 			}
 			catch (Exception ex)
 			{
-				await VS.StatusBar.ShowMessageAsync($"");
+				await VS.StatusBar.ShowMessageAsync(
+					"Failed to enable ADS server. See output window for detailed information."
+				);
 
 				IOutputWindowPane outputWindowPane = await VS.GetRequiredServiceAsync<
 					IOutputWindowPane,

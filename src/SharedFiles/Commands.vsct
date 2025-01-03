@@ -45,6 +45,7 @@
       <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" priority="0x0000" />
 
       <Group guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" priority="0x0000" />
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATIOMappingContextMenuGroup" priority="0x0000" />
         
       <Group guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" priority="0x0000" />
         
@@ -188,6 +189,13 @@
             </Strings>
         </Button>
 
+        <!-- TwinCAT IO Mapping - Context Menu - Show IO Mapping Tool Window -->
+        <Button guid="ProductivityToolsCmdSet" id="ShowMappingToolWindowCommandId" priority="0x0000" type="Button">
+            <Strings>
+                <ButtonText>Show IO Mappings</ButtonText>
+            </Strings>
+        </Button>
+
         <!-- TwinCAT NC Cam Tables - Context Menu - Enable ADS Server -->
         <Button guid="ProductivityToolsCmdSet" id="GenerateCamTablePlcCodeCommandId" priority="0x0000" type="Button">
             <CommandFlag>DefaultDisabled</CommandFlag>
@@ -258,8 +266,17 @@
             <Parent guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" />
         </CommandPlacement>
 
+        <!-- TwinCAT IO Mapping- Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATIOMappingContextMenuGroup" priority="0x0100">
+            <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATIOMappingContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="ShowMappingToolWindowCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATIOMappingContextMenuGroup" />
+        </CommandPlacement>
+
         <!-- TwinCAT XAE Project - Context Menu-->
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" priority="0x0000">
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" priority="0x0100">
             <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATXaeProjectContextMenuId" />
         </CommandPlacement>
 
@@ -322,6 +339,7 @@
         <IDSymbol name="TwinCATNcCamTablesContextMenuGroup" value="0x2450" />
         <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
         <IDSymbol name="TwinCATIODeviceContextMenuGroup" value="0x3250" />
+        <IDSymbol name="TwinCATIOMappingContextMenuGroup" value="0x4250" />
         
         <IDSymbol name="ProductivityToolsSubmenuGroup" value="0x1200" />
         <IDSymbol name="ProductivityToolsCommandsGroup" value="0x1201" />
@@ -348,6 +366,9 @@
         <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
         <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
         <IDSymbol name="GenerateCamTablePlcCodeCommandId" value="0x0422"/>
+        
+        
+        <IDSymbol name="ShowMappingToolWindowCommandId" value="0x0522"/>
 
     </GuidSymbol>
 
@@ -356,6 +377,7 @@
         <IDSymbol name="TwinCATXaeProjectContextMenuId" value="0x8028" />
         <IDSymbol name="TwinCATIODeviceContextMenuId" value="0x8004" />
         <IDSymbol name="TwinCATNcCamTablesContextMenuId" value="0x8025" />
+        <IDSymbol name="TwinCATIOMappingContextMenuId" value="0x801B" />
     </GuidSymbol>
 
     <!-- TwinCAT PLC Command Set -->

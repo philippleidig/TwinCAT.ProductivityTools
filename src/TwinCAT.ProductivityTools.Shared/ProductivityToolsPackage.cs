@@ -1,17 +1,16 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using TCatSysManagerLib;
+using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.InfoBars;
 using TwinCAT.ProductivityTools.Services;
+using TwinCAT.ProductivityTools.ToolWindows;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools
@@ -28,8 +27,15 @@ namespace TwinCAT.ProductivityTools
 	)]
 	[Guid(PackageGuids.ProductivityToolsCmdSetString)]
 	[ProvideMenuResource("Menus.ctmenu", 1)]
+	[ProvideToolWindow(
+		typeof(IOMappingToolWindow.Pane),
+		Orientation = ToolWindowOrientation.Right,
+		Window = EnvDTE.Constants.vsWindowKindMainWindow,
+		Style = VsDockStyle.Tabbed
+	)]
 	[ProvideService((typeof(ITargetSystemService)), IsAsyncQueryable = true)]
 	[ProvideService((typeof(IOutputWindowPane)), IsAsyncQueryable = true)]
+	[ProvideService((typeof(ITwinCATEventListenerService)), IsAsyncQueryable = true)]
 	public sealed class ProductivityToolsPackage : ToolkitPackage
 	{
 		protected override async Task InitializeAsync(
@@ -37,60 +43,27 @@ namespace TwinCAT.ProductivityTools
 			IProgress<ServiceProgressData> progress
 		)
 		{
+			this.RegisterToolWindows();
+
 			await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
 			await this.RegisterServicesAsync();
 			await this.RegisterCommandsAsync();
+			await this.RegisterInfoBarsAsync();
 
-			//jOnSolutionOpened();
+			//ITargetSystemService targetSystemService = await VS.GetServiceAsync<ITargetSystemService, ITargetSystemService>();
 
-			//HideMenuItems();
+			//ITwinCATEventListenerService eventListenerService = await VS.GetServiceAsync<ITwinCATEventListenerService, ITwinCATEventListenerService>();
+			//eventListenerService.Connect(AmsNetId.Local);
+			//eventListenerService.MessageOccured += OnTwinCATMessageOccured;
 		}
 
-		private async void HideMenuItems()
+		private void OnTwinCATMessageOccured(object sender, MessageOccuredEventArgs e)
 		{
-			var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-
-			if (mcs != null)
+			if (e.Event.Severity == DataTypes.EventSeverity.ERROR)
 			{
-				// Command ID aus einer anderen Extension
-				CommandID otherExtensionCommandId = new CommandID(
-					Guid.Parse("74D21311-2AEE-11D1-8BFB-00A0-00A0C90F26F7"),
-					0x3100
-				);
-
-				// Command abrufen und Sichtbarkeit steuern
-				var menuCommand = mcs.FindCommand(otherExtensionCommandId);
-				if (menuCommand != null)
-				{
-					menuCommand.Visible = false; // Command verstecken
-				}
+				VS.MessageBox.ShowError(e.Event.Message);
 			}
-		}
-
-		private async void OnSolutionOpened()
-		{
-			var model = new InfoBarModel(
-				new[]
-				{
-					new InfoBarTextSpan("Activate relative AmsNetIDs."),
-					new InfoBarHyperlink("Go to ")
-				},
-				KnownMonikers.SettingsGroupWarning,
-				true
-			);
-
-			InfoBar infoBar = await VS.InfoBar.CreateAsync(model);
-
-			infoBar.ActionItemClicked += (s, e) =>
-			{
-				ThreadHelper.ThrowIfNotOnUIThread();
-				e.InfoBarUIElement.Close();
-
-				// systemManager.EnableUseRelativeNetIds();
-			};
-
-			await infoBar.TryShowInfoBarUIAsync();
 		}
 
 		private async Task RegisterServicesAsync()
@@ -98,9 +71,20 @@ namespace TwinCAT.ProductivityTools
 			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<EnvDTE.DTE, EnvDTE.DTE>();
 
 			this.AddService<OutputWindow, IOutputWindowPane>(new OutputWindow());
+
 			this.AddService<TargetSystemService, ITargetSystemService>(
 				new TargetSystemService(dte)
 			);
+
+			this.AddService<TwinCATEventListenerService, ITwinCATEventListenerService>(
+				new TwinCATEventListenerService()
+			);
+		}
+
+		private async Task RegisterInfoBarsAsync()
+		{
+			UseRelativeNetIdsInfoBar infoBar = new UseRelativeNetIdsInfoBar();
+			await infoBar.ShowAsync();
 		}
 	}
 }

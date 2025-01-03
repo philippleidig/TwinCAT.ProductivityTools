@@ -35,6 +35,7 @@ namespace TwinCAT.ProductivityTools
         public const int TwinCATNcCamTablesContextMenuGroup = 0x2450;
         public const int TwinCATXaeProjectContextMenuGroup = 0x2350;
         public const int TwinCATIODeviceContextMenuGroup = 0x3250;
+        public const int TwinCATIOMappingContextMenuGroup = 0x4250;
         public const int ProductivityToolsSubmenuGroup = 0x1200;
         public const int ProductivityToolsCommandsGroup = 0x1201;
         public const int ProductivityToolsSubmenu = 0x1202;
@@ -55,9 +56,11 @@ namespace TwinCAT.ProductivityTools
         public const int OpenLoggedEventsCommandId = 0x0322;
         public const int UseRelativeNetIdsCommandId = 0x0323;
         public const int GenerateCamTablePlcCodeCommandId = 0x0422;
+        public const int ShowMappingToolWindowCommandId = 0x0522;
         public const int TwinCATXaeProjectContextMenuId = 0x8028;
         public const int TwinCATIODeviceContextMenuId = 0x8004;
         public const int TwinCATNcCamTablesContextMenuId = 0x8025;
+        public const int TwinCATIOMappingContextMenuId = 0x801B;
         public const int TwinCATPlcProjectContextMenuId = 0x9013;
         public const int TwinCATPlcFileContextMenuId = 0x9011;
         public const int TwinCATPlcFolderContextMenuId = 0x9010;

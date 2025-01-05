@@ -1,12 +1,14 @@
 name: "Build"
 
+permissions: 
+  contents: write
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
-    branches: [main]
       
 jobs:
   build:
@@ -25,7 +27,7 @@ jobs:
     - uses: actions/checkout@v3
   
     - name: Setup .NET build dependencies
-      uses: timheuer/bootstrap-dotnet@v1
+      uses: timheuer/bootstrap-dotnet@v2
       with:
         nuget: 'false'
         sdk: 'false'
@@ -34,25 +36,24 @@ jobs:
     - name: Format *.cs files
       run: |
           dotnet tool restore
-          dotnet format
           dotnet csharpier .
 
     - name: Increment VSIX version 15
       id: vsix_version_15
-      uses: timheuer/vsix-version-stamp@v1
+      uses: timheuer/vsix-version-stamp@v2
       with:
         manifest-file: ${{ env.Vsix15ManifestPath }}
         vsix-token-source-file: ${{ env.Vsix15ManifestSourcePath }}
 
     - name: Increment VSIX version 17
       id: vsix_version_17
-      uses: timheuer/vsix-version-stamp@v1
+      uses: timheuer/vsix-version-stamp@v2
       with:
         manifest-file: ${{ env.Vsix17ManifestPath }}
         vsix-token-source-file: ${{ env.Vsix17ManifestSourcePath }}
 
     - name: Build
-      run: msbuild /v:m -restore /p:OutDir=bin\Release
+      run:  msbuild /v:m -restore /p:OutDir=bin\Release /p:Configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal
       
     - name: Install inno setup package via chocolatey
       run: choco install innosetup
@@ -61,7 +62,7 @@ jobs:
       run: iscc.exe setup\TwinCAT.ProductivityTools.iss
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: TwinCAT.ProductivityTools_${{ steps.vsix_version_15.outputs.version-number }}.exe
         path: dist/*.exe
@@ -69,23 +70,25 @@ jobs:
   publish:
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     needs: build
+    name: Publish 
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Download Package artifact
-        uses: actions/download-artifact@v2 
+        uses: actions/download-artifact@v4
         with:
           name: TwinCAT.ProductivityTools_${{ needs.build.outputs.version }}.exe
 
       - name: Tag and Release
         if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]') }}
         id: tag_release
-        uses: softprops/action-gh-release@v0.1.13
+        uses: softprops/action-gh-release@v2
         with:
           body: Release ${{ needs.build.outputs.version }}
           tag_name: ${{ needs.build.outputs.version }}
+          generate_release_notes: true
           files: |
             **/*.exe
 

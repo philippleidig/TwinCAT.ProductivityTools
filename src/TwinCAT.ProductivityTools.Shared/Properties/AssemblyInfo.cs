@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using TwinCAT.ProductivityTools;
 
 [assembly: AssemblyTitle(Vsix.Name)]
-[assembly: AssemblyVersion(Vsix.Version)]
 [assembly: AssemblyDescription(Vsix.Description)]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany(Vsix.Author)]
@@ -14,3 +13,6 @@ using TwinCAT.ProductivityTools;
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
+
+[assembly: AssemblyVersion(Vsix.Version)]
+[assembly: AssemblyFileVersion(Vsix.Version)]

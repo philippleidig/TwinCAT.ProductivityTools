@@ -7,6 +7,7 @@
 
 #define TcXaeShellExtensionsFolder15 "C:\Program Files (x86)\Beckhoff\TcXaeShell\Common7\IDE\Extensions\"
 #define TcXaeShellExtensionsFolder17 "C:\Program Files\Beckhoff\TcXaeShell\Common7\IDE\Extensions\"
+#define TcPlcTemplatesFolder "C:\TwinCAT\3.1\Components\Plc\PlcTemplates\1.0.0.0\Plc Templates\"
 #define PackageVsixGuid "1e6f317c-4b46-4f08-96dc-4ab7dc8a1032"                            
 
 [Setup]
@@ -33,6 +34,7 @@ WizardSmallImageFile=..\assets\images\twincat.bmp
 SetupLogging=yes
 
 [Files]
+Source: "..\templates\*"; DestDir: "{#TcPlcTemplatesFolder}TwinCAT.ProductivityTools.Templates"; Flags: ignoreversion recursesubdirs createallsubdirs;
 Source: "..\src\TwinCAT.ProductivityTools.15\bin\Release\Package\*"; DestDir: "{#TcXaeShellExtensionsFolder15}TwinCAT.ProductivityTools"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: InstallVsixInTcXaeShell15;
 Source: "..\src\TwinCAT.ProductivityTools.17\bin\Release\Package\*"; DestDir: "{#TcXaeShellExtensionsFolder17}TwinCAT.ProductivityTools"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: InstallVsixInTcXaeShell17;
 Source: "..\src\TwinCAT.ProductivityTools.15\bin\Release\TwinCAT.ProductivityTools.15.vsix"; DestDir: "{tmp}"; Flags: deleteafterinstall;

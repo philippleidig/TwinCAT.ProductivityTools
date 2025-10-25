@@ -38,7 +38,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems*{0fdb9f73-33c4-4cc7-9813-8d9a4bebbc0e}*SharedItemsImports = 13
-		src\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems*{710545a5-e083-4f4c-a7ac-c0f8b2e1f255}*SharedItemsImports = 5
-		src\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems*{f11ed694-ad48-4596-87e0-f19c663caf9c}*SharedItemsImports = 5
+		src\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems*{710545a5-e083-4f4c-a7ac-c0f8b2e1f255}*SharedItemsImports = 4
+		src\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems*{f11ed694-ad48-4596-87e0-f19c663caf9c}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

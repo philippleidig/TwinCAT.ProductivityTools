@@ -363,3 +363,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# VSCT / VSIX synchronizer output that is generated into the VSIX projects
+src/TwinCAT.ProductivityTools.1?/Commands.cs
+
+# Screenshot capture scratch output
+docs/images/.scratch/

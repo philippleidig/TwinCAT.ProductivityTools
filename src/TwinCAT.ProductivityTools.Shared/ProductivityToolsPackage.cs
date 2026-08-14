@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
-using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.InfoBars;
@@ -50,20 +49,6 @@ namespace TwinCAT.ProductivityTools
 			await this.RegisterServicesAsync();
 			await this.RegisterCommandsAsync();
 			await this.RegisterInfoBarsAsync();
-
-			//ITargetSystemService targetSystemService = await VS.GetServiceAsync<ITargetSystemService, ITargetSystemService>();
-
-			//ITwinCATEventListenerService eventListenerService = await VS.GetServiceAsync<ITwinCATEventListenerService, ITwinCATEventListenerService>();
-			//eventListenerService.Connect(AmsNetId.Local);
-			//eventListenerService.MessageOccured += OnTwinCATMessageOccured;
-		}
-
-		private void OnTwinCATMessageOccured(object sender, MessageOccuredEventArgs e)
-		{
-			if (e.Event.Severity == DataTypes.EventSeverity.ERROR)
-			{
-				VS.MessageBox.ShowError(e.Event.Message);
-			}
 		}
 
 		private async Task RegisterServicesAsync()

@@ -11,7 +11,7 @@ namespace TwinCAT.ProductivityTools
         public const string Name = "TwinCAT 3.1 ProductivityTools";
         public const string Description = @"Tools for higher productivity when working with TwinCAT 3.1";
         public const string Language = "en-US";
-        public const string Version = "1.2.0";
+        public const string Version = "2.0.0";
         public const string Author = "Philipp Leidig";
         public const string Tags = "beckhoff twincat";
     }

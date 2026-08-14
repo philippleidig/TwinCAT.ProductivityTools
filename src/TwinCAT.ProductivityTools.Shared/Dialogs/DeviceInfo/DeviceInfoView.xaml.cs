@@ -4,25 +4,25 @@ using TwinCAT.Ads;
 
 namespace TwinCAT.ProductivityTools
 {
-    public partial class DeviceInfoView : BaseDialogWindow
-    {
-        public DeviceInfoView(AmsNetId target)
-        {
-            InitializeComponent();
+	public partial class DeviceInfoView : BaseDialogWindow
+	{
+		public DeviceInfoView(AmsNetId target)
+		{
+			InitializeComponent();
 
-            this.Title = "Device Info Remote";
+			this.Title = "Device Info Remote";
 
-            viewModel = new DeviceInfoViewModel(target);
-            DataContext = viewModel;
+			viewModel = new DeviceInfoViewModel(target);
+			DataContext = viewModel;
 
-            Loaded += OnLoaded;
-        }
+			Loaded += OnLoaded;
+		}
 
-        private async void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            await viewModel.InitializeAsync();
-        }
+		private async void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			await viewModel.InitializeAsync();
+		}
 
-        private DeviceInfoViewModel viewModel;
-    }
+		private DeviceInfoViewModel viewModel;
+	}
 }

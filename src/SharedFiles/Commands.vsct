@@ -48,8 +48,6 @@
       <Group guid="ProductivityToolsCmdSet" id="TwinCATIOMappingContextMenuGroup" priority="0x0000" />
         
       <Group guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" priority="0x0000" />
-        
-      <Group guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" priority="0x0000" />
     </Groups>
 
 
@@ -196,16 +194,6 @@
             </Strings>
         </Button>
 
-        <!-- TwinCAT NC Cam Tables - Context Menu - Enable ADS Server -->
-        <Button guid="ProductivityToolsCmdSet" id="GenerateCamTablePlcCodeCommandId" priority="0x0000" type="Button">
-            <CommandFlag>DefaultDisabled</CommandFlag>
-            <CommandFlag>DefaultInvisible</CommandFlag>
-            <CommandFlag>DynamicVisibility</CommandFlag>
-            <Strings>
-                <ButtonText>Generate PLC Code</ButtonText>
-            </Strings>
-        </Button>
-
         
         <!-- TwinCAT PLC File - Context Menu - Remove Comments -->
         <Button guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0100" type="Button">
@@ -293,15 +281,6 @@
         </CommandPlacement>
 
        
-        <!-- TwinCAT NC Cam Tables - Context Menu-->
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" priority="0x0000">
-            <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATNcCamTablesContextMenuId" />
-        </CommandPlacement>
-
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="GenerateCamTablePlcCodeCommandId" priority="0x0000">
-            <Parent guid="ProductivityToolsCmdSet" id="TwinCATNcCamTablesContextMenuGroup" />
-        </CommandPlacement>
-
         <!-- TwinCAT PLC Project File - Context Menu-->
         <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0010">
             <Parent guid="TwinCATPlcProjectCmdSet" id="TwinCATPlcFileContextMenuId" />
@@ -336,7 +315,6 @@
         <IDSymbol name="TwinCATProductivityTools" value="0x1020" />
         <IDSymbol name="TwinCATPlcFileContextMenuGroup" value="0x1250" />
         <IDSymbol name="TwinCATPlcFolderContextMenuGroup" value="0x2250" />
-        <IDSymbol name="TwinCATNcCamTablesContextMenuGroup" value="0x2450" />
         <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
         <IDSymbol name="TwinCATIODeviceContextMenuGroup" value="0x3250" />
         <IDSymbol name="TwinCATIOMappingContextMenuGroup" value="0x4250" />
@@ -365,7 +343,6 @@
         <IDSymbol name="FreezeProjectCommandId" value="0x0321"/>
         <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
         <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
-        <IDSymbol name="GenerateCamTablePlcCodeCommandId" value="0x0422"/>
         
         
         <IDSymbol name="ShowMappingToolWindowCommandId" value="0x0522"/>
@@ -376,7 +353,6 @@
     <GuidSymbol name="TwinCATXaeProjectCmdSet" value="{40EE08E0-8FB4-46E9-BAAB-100E60019B7B}">
         <IDSymbol name="TwinCATXaeProjectContextMenuId" value="0x8028" />
         <IDSymbol name="TwinCATIODeviceContextMenuId" value="0x8004" />
-        <IDSymbol name="TwinCATNcCamTablesContextMenuId" value="0x8025" />
         <IDSymbol name="TwinCATIOMappingContextMenuId" value="0x801B" />
     </GuidSymbol>
 

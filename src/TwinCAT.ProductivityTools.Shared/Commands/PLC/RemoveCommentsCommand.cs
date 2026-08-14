@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Plc;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
@@ -14,6 +14,8 @@ namespace TwinCAT.ProductivityTools.Commands
 	[Command(PackageIds.RemoveCommentsCommandId)]
 	internal class RemoveCommentsCommand : BaseCommand<RemoveCommentsCommand>
 	{
+		private readonly ICommentRemover commentRemover = new CommentRemover();
+
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
 			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
@@ -77,38 +79,7 @@ namespace TwinCAT.ProductivityTools.Commands
 			if (string.IsNullOrEmpty(text))
 				return;
 
-			string lineEnding = text.Contains("\r\n") ? "\r\n" : "\n";
-
-			var newLines = new List<string>();
-			var lines = text.Split(new[] { lineEnding }, StringSplitOptions.None);
-
-			var isMultiLineCommentActive = false;
-
-			foreach (var line in lines)
-			{
-				var re =
-					@"(@(?:""[^""]*"")+|""(?:[^""\n\\]+|\\.)*""|'(?:[^'\n\\]+|\\.)*')|//.*|\(\*(?s:.*?)\*\)";
-				string cleanedLine = Regex.Replace(line, re, "$1");
-
-				if (Regex.IsMatch(cleanedLine, "(\\(\\*.*)"))
-				{
-					isMultiLineCommentActive = true;
-				}
-
-				if (Regex.IsMatch(cleanedLine, "(.*\\*\\))"))
-				{
-					isMultiLineCommentActive = false;
-				}
-
-				if (isMultiLineCommentActive)
-				{
-					continue;
-				}
-
-				newLines.Add(cleanedLine);
-			}
-
-			updateTextAction(string.Join(lineEnding, newLines));
+			updateTextAction(commentRemover.Remove(text));
 		}
 	}
 }

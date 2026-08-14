@@ -12,7 +12,8 @@ using Task = System.Threading.Tasks.Task;
 namespace TwinCAT.ProductivityTools.Commands
 {
 	//[Command(PackageIds.DeleteBuildArtifactsOnCleanCommandId)]
-	internal class DeleteBuildArtifactsOnCleanCommand : BaseCommand<DeleteBuildArtifactsOnCleanCommand>
+	internal class DeleteBuildArtifactsOnCleanCommand
+		: BaseCommand<DeleteBuildArtifactsOnCleanCommand>
 	{
 		private void OnProjectCleanStarted(Project project)
 		{
@@ -71,11 +72,11 @@ namespace TwinCAT.ProductivityTools.Commands
 			if (!isChecked)
 			{
 				VS.Events.BuildEvents.ProjectCleanStarted += OnProjectCleanStarted;
-			} else
+			}
+			else
 			{
 				VS.Events.BuildEvents.ProjectCleanStarted -= OnProjectCleanStarted;
 			}
 		}
-
 	}
 }

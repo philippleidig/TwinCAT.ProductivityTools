@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>TwinCAT.ProductivityTools</RootNamespace>
+    <AssemblyName>TwinCAT.ProductivityTools.Core</AssemblyName>
+    <LangVersion>7.3</LangVersion>
+    <Company>Philipp Leidig</Company>
+    <Product>TwinCAT 3.1 ProductivityTools</Product>
+    <Description>Visual Studio independent core logic of the TwinCAT 3.1 ProductivityTools.</Description>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\TwinCAT.ProductivityTools.17\Key.snk</AssemblyOriginatorKeyFile>
+    <!-- The consuming VSIX projects resolve the shared NuGet dependencies themselves. -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="7.0.172" />
+  </ItemGroup>
+
+</Project>

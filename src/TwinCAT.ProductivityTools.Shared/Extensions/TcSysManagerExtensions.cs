@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using EnvDTE;
+using System;
 using TCatSysManagerLib;
+using TwinCAT.ProductivityTools.Installation;
 
 namespace TwinCAT.ProductivityTools.Extensions
 {
@@ -11,32 +8,16 @@ namespace TwinCAT.ProductivityTools.Extensions
 	{
 		public static bool IsUseRelativeNetIdsEnabled(this ITcSysManager systemManager)
 		{
-			ITcSmTreeItem routing = systemManager.LookupTreeItem("TIRR"); // Routing
+			ITcSmTreeItem routing = systemManager?.LookupTreeItem(RoutingXml.RoutingTreeItemPath);
 
-			// "<TreeItem><RoutePrj><UseRelativeNetIds>true</UseRelativeNetIds><RoutePrj><TreeItem>";
-			string xml = routing.ProduceXml();
-
-			XmlDocument xmlDocument = new XmlDocument();
-			xmlDocument.LoadXml(xml);
-
-			XmlNode useRelativeNetIdsNode = xmlDocument.SelectSingleNode("//UseRelativeNetIds");
-
-			if (useRelativeNetIdsNode == null)
-			{
-				return false;
-			}
-
-			string value = useRelativeNetIdsNode.InnerText;
-			return bool.Parse(value);
+			return routing != null && RoutingXml.IsUseRelativeNetIdsEnabled(routing.ProduceXml());
 		}
 
 		public static void EnableUseRelativeNetIds(this ITcSysManager systemManager)
 		{
-			ITcSmTreeItem routing = systemManager.LookupTreeItem("TIRR"); // Routing
+			ITcSmTreeItem routing = systemManager?.LookupTreeItem(RoutingXml.RoutingTreeItemPath);
 
-			string xml =
-				"<TreeItem><RoutePrj><UseRelativeNetIds>true</UseRelativeNetIds></RoutePrj></TreeItem>";
-			routing.ConsumeXml(xml);
+			routing?.ConsumeXml(RoutingXml.EnableUseRelativeNetIds());
 		}
 	}
 }

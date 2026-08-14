@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,7 +8,7 @@ using TwinCAT.ProductivityTools.Extensions;
 
 namespace TwinCAT.ProductivityTools.Helpers
 {
-	internal static class RegexPatterns
+	public static class RegexPatterns
 	{
 		public static readonly Regex MatchEmptyRegex = new Regex("$^", RegexOptions.Compiled);
 		public static readonly Regex RangeRegex = new Regex(

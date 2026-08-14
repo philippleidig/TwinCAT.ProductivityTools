@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Plc;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
@@ -14,6 +14,8 @@ namespace TwinCAT.ProductivityTools.Commands
 	[Command(PackageIds.RemoveRegionsCommandId)]
 	internal class RemoveRegionsCommand : BaseCommand<RemoveRegionsCommand>
 	{
+		private readonly IRegionRemover regionRemover = new RegionRemover();
+
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
 			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
@@ -77,23 +79,7 @@ namespace TwinCAT.ProductivityTools.Commands
 			if (string.IsNullOrEmpty(text))
 				return;
 
-			string lineEnding = text.Contains("\r\n") ? "\r\n" : "\n";
-
-			var newLines = new List<string>();
-			var lines = text.Split(new[] { lineEnding }, StringSplitOptions.None);
-
-			foreach (var line in lines)
-			{
-				if (
-					!Regex.IsMatch(line, "^\\{region\\s+\"[^\"]*\"\\}$")
-					&& !Regex.IsMatch(line, "^\\{endregion\\}$")
-				)
-				{
-					newLines.Add(line);
-				}
-			}
-
-			updateTextAction(string.Join(lineEnding, newLines));
+			updateTextAction(regionRemover.Remove(text));
 		}
 	}
 }

@@ -1,9 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace TwinCAT.ProductivityTools.Helpers
 {
-	internal class FileFilterProvider : IEnumerable<string>
+	public class FileFilterProvider : IEnumerable<string>
 	{
 		private IEnumerable<string> _files = new List<string>()
 		{

@@ -1,24 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TCatSysManagerLib;
+using TwinCAT.ProductivityTools.Io;
 
 namespace TwinCAT.ProductivityTools.ToolWindows
 {
-	public class Variable
-	{
-		public string Name { get; set; }
-		public string Path { get; set; }
-		public int Size { get; set; }
-		public int Offset { get; set; }
-	}
-
 	public class TreeNode
 	{
 		public string Name { get; set; }
@@ -87,13 +79,14 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 
 		public void Reload()
 		{
-			string xmlMappingInfo = _systemManager.ProduceMappingInfo();
-			Variables = ExtractVariables(xmlMappingInfo);
+			string xmlMappingInfo = _systemManager?.ProduceMappingInfo();
+			Variables =
+				new IoMappingParser().Parse(xmlMappingInfo) as Dictionary<string, List<Variable>>;
 
 			TreeData = new ObservableCollection<TreeNode>(BuildTree(Variables));
 			FilteredTreeData = new ObservableCollection<TreeNode>(TreeData);
 
-			SearchQuery = string.Empty; // Suche zurücksetzen
+			SearchQuery = string.Empty;
 		}
 
 		private void OnTreeItemSelected(TreeNode node)
@@ -173,55 +166,8 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 			return null;
 		}
 
-		public static Dictionary<string, List<Variable>> ExtractVariables(string mappings)
-		{
-			var document = XDocument.Parse(mappings);
-			var result = new Dictionary<string, List<Variable>>();
-
-			var ownersA = document.Descendants("OwnerA");
-			foreach (var ownerA in ownersA)
-			{
-				string ownerAName = ownerA.Attribute("Name").Value;
-
-				foreach (var ownerB in ownerA.Elements("OwnerB"))
-				{
-					string ownerBName = ownerB.Attribute("Name").Value;
-
-					foreach (var link in ownerB.Elements("Link"))
-					{
-						string varA = link.Attribute("VarA").Value;
-						string varB = link.Attribute("VarB").Value;
-
-						var variable = new Variable
-						{
-							Name = $"{ownerBName}^{varB}",
-							Path = varB,
-							Size =
-								link.Attribute("Size") != null
-									? int.Parse(link.Attribute("Size").Value)
-									: 0,
-							Offset =
-								link.Attribute("OffsA") != null
-									? int.Parse(link.Attribute("OffsA").Value)
-									: link.Attribute("OffsB") != null
-										? int.Parse(link.Attribute("OffsB").Value)
-										: 0
-						};
-
-						string key = $"{ownerAName}^{varA}";
-
-						if (!result.ContainsKey(key))
-						{
-							result[key] = new List<Variable>();
-						}
-
-						result[key].Add(variable);
-					}
-				}
-			}
-
-			return result;
-		}
+		public static Dictionary<string, List<Variable>> ExtractVariables(string mappings) =>
+			(Dictionary<string, List<Variable>>)new IoMappingParser().Parse(mappings);
 
 		private ObservableCollection<TreeNode> BuildTree(
 			Dictionary<string, List<Variable>> dictionary

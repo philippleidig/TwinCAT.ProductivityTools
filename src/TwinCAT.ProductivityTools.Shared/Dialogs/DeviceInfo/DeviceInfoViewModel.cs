@@ -10,109 +10,112 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using TwinCAT.Ads;
 using CommunityToolkit.Mvvm.ComponentModel;
+using TwinCAT.Ads;
 
 namespace TwinCAT.ProductivityTools
 {
-    class DeviceInfoViewModel : ObservableObject
-    {
-        public DeviceInfoViewModel(AmsNetId target)
-        {
-            Target = target;
-            try
-            {
-				if(AmsNetId.Local.Equals(target))
+	class DeviceInfoViewModel : ObservableObject
+	{
+		public DeviceInfoViewModel(AmsNetId target)
+		{
+			Target = target;
+			try
+			{
+				if (AmsNetId.Local.Equals(target))
 				{
 					TargetName = "Local";
 				}
 				else
 				{
-					TargetName = AmsRouter.ListRoutes().Where(x => x.NetId == Target.ToString()).FirstOrDefault().Name;
-				}   
-            }
-            catch { }
-        }
+					TargetName = AmsRouter
+						.ListRoutes()
+						.Where(x => x.NetId == Target.ToString())
+						.FirstOrDefault()
+						.Name;
+				}
+			}
+			catch { }
+		}
 
-        public async Task InitializeAsync ()
-        {
-            IsBusy = true;
-            Functions = new ObservableCollection<Function>();
+		public async Task InitializeAsync()
+		{
+			IsBusy = true;
+			Functions = new ObservableCollection<Function>();
 
-            try
-            {
-                DeviceInfo = await RemoteControl.GetDeviceInfoAsync(Target, CancellationToken.None);
-             
-                var functions = await Function.ListFunctionsAsync(new Ads.AmsNetId(Target), CancellationToken.None);
+			try
+			{
+				DeviceInfo = await RemoteControl.GetDeviceInfoAsync(Target, CancellationToken.None);
 
-                foreach( var function in functions)
-                {
-                    Functions.Add(function);
-                }
-                
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+				var functions = await Function.ListFunctionsAsync(
+					new Ads.AmsNetId(Target),
+					CancellationToken.None
+				);
 
-        private bool _isBusy;
-        public bool IsBusy
-        {
-            get => _isBusy;
-            private set
-            {
-                _isBusy = value;
-            }   
-        }
+				foreach (var function in functions)
+				{
+					Functions.Add(function);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+			finally
+			{
+				IsBusy = false;
+			}
+		}
 
-        private ObservableCollection<Function> _functions;
-        public ObservableCollection<Function> Functions
-        {
-            get => _functions;
-            private set
-            {
-                _functions = value;
-                OnPropertyChanged("Functions");
-            }
-        }
+		private bool _isBusy;
+		public bool IsBusy
+		{
+			get => _isBusy;
+			private set { _isBusy = value; }
+		}
 
-        private TwinCAT.ProductivityTools.DeviceInfo _deviceInfo;
-        public TwinCAT.ProductivityTools.DeviceInfo DeviceInfo
-        {
-            get => _deviceInfo;
-            set
-            {
-                _deviceInfo = value;
-                OnPropertyChanged("DeviceInfo");
-            }
-        }
+		private ObservableCollection<Function> _functions;
+		public ObservableCollection<Function> Functions
+		{
+			get => _functions;
+			private set
+			{
+				_functions = value;
+				OnPropertyChanged("Functions");
+			}
+		}
 
-        private AmsNetId _target;
-        public AmsNetId Target
-        {
-            get => _target;
-            private set
-            {
-                _target = value;
-                OnPropertyChanged("Target");
-            }
-        }
+		private TwinCAT.ProductivityTools.DeviceInfo _deviceInfo;
+		public TwinCAT.ProductivityTools.DeviceInfo DeviceInfo
+		{
+			get => _deviceInfo;
+			set
+			{
+				_deviceInfo = value;
+				OnPropertyChanged("DeviceInfo");
+			}
+		}
 
-        private string _targetName = string.Empty;
-        public string TargetName
-        {
-            get => _targetName;
-            private set
-            {
-                _targetName = value;
-                OnPropertyChanged("TargetName");
-            }
-        }
-    }
+		private AmsNetId _target;
+		public AmsNetId Target
+		{
+			get => _target;
+			private set
+			{
+				_target = value;
+				OnPropertyChanged("Target");
+			}
+		}
+
+		private string _targetName = string.Empty;
+		public string TargetName
+		{
+			get => _targetName;
+			private set
+			{
+				_targetName = value;
+				OnPropertyChanged("TargetName");
+			}
+		}
+	}
 }

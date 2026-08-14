@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
@@ -71,9 +71,10 @@ namespace TwinCAT.ProductivityTools.Services
 		/// </summary>
 		private void OnProjectCleanDone(ProjectBuildDoneEventArgs args)
 		{
-			ThreadHelper
-				.JoinableTaskFactory.RunAsync(() => CleanAsync(args?.Project))
-				.FireAndForget();
+			BackgroundWork.Run(
+				() => CleanAsync(args?.Project),
+				"Failed to delete the build artifacts."
+			);
 		}
 
 		private async Task CleanAsync(Community.VisualStudio.Toolkit.Project project)

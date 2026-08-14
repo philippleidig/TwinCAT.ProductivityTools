@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,69 +24,112 @@ namespace TwinCAT.ProductivityTools
 
 	public static class AdsRegistry
 	{
+		/// <summary>
+		/// Reads a registry value from a remote target.
+		/// </summary>
+		/// <remarks>
+		/// The request is the sub key and the value name, each null terminated. The response is
+		/// the raw value, which the caller expects to be a string.
+		/// </remarks>
 		public static async Task<string> QueryValueAsync(
 			AmsNetId target,
 			string subKey,
-			string valueName
+			string valueName,
+			CancellationToken cancel = default(CancellationToken)
 		)
 		{
-			using (AdsClient client = new AdsClient())
+			if (target == null)
+			{
+				throw new ArgumentNullException(nameof(target));
+			}
+
+			if (string.IsNullOrEmpty(subKey))
+			{
+				throw new ArgumentException("A sub key is required.", nameof(subKey));
+			}
+
+			using (var client = new AdsClient())
 			{
 				client.Connect(new AmsAddress(target, AmsPort.SystemService));
 
-				var readBuffer = new Memory<byte>(new byte[255]);
+				var request = new List<byte>();
 
-				var data = new List<byte>();
+				request.AddRange(System.Text.Encoding.UTF8.GetBytes(subKey));
+				request.Add(0); // End delimiter
+				request.AddRange(System.Text.Encoding.UTF8.GetBytes(valueName ?? string.Empty));
+				request.Add(0);
 
-				data.AddRange(System.Text.Encoding.UTF8.GetBytes(subKey));
-				data.Add(new byte()); // End delimiter
-				data.AddRange(System.Text.Encoding.UTF8.GetBytes(valueName));
-				data.Add(new byte());
+				byte[] response = new byte[255];
 
-				var writeBuffer = new ReadOnlyMemory<byte>(data.ToArray());
-
-				var result = await client.ReadWriteAsync(
+				ResultReadWriteBytes result = await client.ReadWriteAsync(
 					200,
 					0,
-					readBuffer,
-					writeBuffer,
-					CancellationToken.None
+					response.Length,
+					new ReadOnlyMemory<byte>(request.ToArray()),
+					cancel
 				);
+
 				result.ThrowOnError();
+
+				result.Data.CopyTo(response);
+
+				// The target terminates the value, and everything behind it is whatever the
+				// buffer happened to contain.
+				int end = Array.IndexOf(response, (byte)0, 0, result.ReadBytes);
+
 				return System.Text.Encoding.UTF8.GetString(
-					readBuffer.ToArray(),
+					response,
 					0,
-					result.ReadBytes
+					end < 0 ? result.ReadBytes : end
 				);
 			}
 		}
 
+		/// <summary>
+		/// Writes a registry value on a remote target.
+		/// </summary>
 		public static async Task SetValueAsync(
 			AmsNetId target,
 			string subKey,
 			string valueName,
 			RegistryValueType type,
-			IEnumerable<byte> data
+			IEnumerable<byte> data,
+			CancellationToken cancel = default(CancellationToken)
 		)
 		{
-			using (AdsClient client = new AdsClient())
+			if (target == null)
+			{
+				throw new ArgumentNullException(nameof(target));
+			}
+
+			if (string.IsNullOrEmpty(subKey))
+			{
+				throw new ArgumentException("A sub key is required.", nameof(subKey));
+			}
+
+			using (var client = new AdsClient())
 			{
 				client.Connect(new AmsAddress(target, AmsPort.SystemService));
 
-				var writeBuffer = new List<byte>();
+				var request = new List<byte>();
 
-				writeBuffer.AddRange(System.Text.Encoding.UTF8.GetBytes(subKey));
-				writeBuffer.Add(new byte()); // End delimiter
-				writeBuffer.AddRange(System.Text.Encoding.UTF8.GetBytes(valueName));
-				writeBuffer.Add(new byte());
-				writeBuffer.AddRange(data);
+				request.AddRange(System.Text.Encoding.UTF8.GetBytes(subKey));
+				request.Add(0); // End delimiter
+				request.AddRange(System.Text.Encoding.UTF8.GetBytes(valueName ?? string.Empty));
+				request.Add(0);
 
-				var result = await client.WriteAsync(
+				if (data != null)
+				{
+					request.AddRange(data);
+				}
+
+				ResultWrite result = await client.WriteAsync(
 					200,
 					0,
-					new ReadOnlyMemory<byte>(writeBuffer.ToArray()),
-					CancellationToken.None
+					new ReadOnlyMemory<byte>(request.ToArray()),
+					cancel
 				);
+
 				result.ThrowOnError();
 			}
 		}

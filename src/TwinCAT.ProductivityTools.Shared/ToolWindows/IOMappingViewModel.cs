@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -118,11 +118,7 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 				FilteredTreeData = new ObservableCollection<TreeNode>();
 				Status = "The mapping information could not be read.";
 
-				ThreadHelper
-					.JoinableTaskFactory.RunAsync(
-						() => Report.FailureAsync("Failed to read the I/O mapping.", ex)
-					)
-					.FireAndForget();
+				Report.Failure("Failed to read the I/O mapping.", ex);
 			}
 		}
 
@@ -175,11 +171,7 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 			{
 				Status = "The export failed.";
 
-				ThreadHelper
-					.JoinableTaskFactory.RunAsync(
-						() => Report.FailureAsync("Failed to export the I/O mapping.", ex)
-					)
-					.FireAndForget();
+				Report.Failure("Failed to export the I/O mapping.", ex);
 			}
 		}
 

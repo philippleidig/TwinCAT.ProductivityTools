@@ -1,177 +1,215 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using TwinCAT.Ads;
+using TwinCAT.ProductivityTools.Installation;
 
 namespace TwinCAT.ProductivityTools
 {
+	/// <summary>
+	/// Reads the network configuration of a TwinCAT target and installs the real time driver on
+	/// one of its adapters.
+	/// </summary>
 	public class NetworkManager : IDisposable
 	{
-		public AmsNetId Target { get; private set; }
+		private const string RteInstallExecutable = "TcRteInstall.exe";
 
-		private AdsClient _adsClient { get; set; }
+		private AdsClient client;
+
+		public AmsNetId Target { get; }
 
 		public NetworkManager(AmsNetId target)
 		{
+			if (target == null)
+			{
+				throw new ArgumentNullException(nameof(target));
+			}
+
 			Target = target;
-			Initialize();
+
+			Connect();
 		}
 
 		public NetworkManager(string target)
+			: this(Parse(target)) { }
+
+		private static AmsNetId Parse(string target)
 		{
-			Target = new AmsNetId(target);
-			Initialize();
-		}
+			AmsNetId netId;
 
-		private void Initialize()
-		{
-			_adsClient = new AdsClient();
-			_adsClient.Connect(Target, AmsPort.SystemService);
-
-			if (!_adsClient.IsConnected)
-				throw new Exception("Could not connect to target " + Target.ToString());
-		}
-
-		public async Task<List<LocalAreaConnection>> ListConnectionsAsync(CancellationToken cancel)
-		{
-			var adapters = new List<LocalAreaConnection>();
-
-			var count = await GetAdaptersCountAsync();
-
-			var buffer = new Memory<byte>(new byte[count * 640]);
-			var res = await _adsClient.ReadAsync(701, 1, buffer, cancel);
-			res.ThrowOnError();
-
-			// Slice byte array into 640 byte parts
-			foreach (byte[] slice in buffer.ToArray().Slices(640))
+			if (!AmsNetId.TryParse(target, out netId))
 			{
-				var guid = new Guid(
-					System
-						.Text.Encoding.UTF8.GetString(
-							slice.Skip<byte>(8).Take<byte>(260).ToArray<byte>()
-						)
-						.Split(new char[] { '{', '}' })[1]
-				);
-				var desc = ArrayHelpers.ByteArrayToString(
-					slice.Skip<byte>(268).Take<byte>(131).ToArray<byte>()
-				);
-				var macAddr = new PhysicalAddress(
-					slice.Skip<byte>(404).Take<byte>(6).ToArray<byte>()
-				);
-				var type = BitConverter.ToInt16(
-					slice.Skip<byte>(416).Take<byte>(4).ToArray<byte>(),
-					0
-				);
-				var ipAddr = ArrayHelpers.ByteArrayToString(
-					slice.Skip<byte>(432).Take<byte>(15).ToArray<byte>()
-				);
-				var subnet = ArrayHelpers.ByteArrayToString(
-					slice.Skip<byte>(448).Take<byte>(15).ToArray<byte>()
-				);
-				var gateway = ArrayHelpers.ByteArrayToString(
-					slice.Skip<byte>(472).Take<byte>(15).ToArray<byte>()
-				);
-				var dhcp = BitConverter.ToBoolean(
-					slice.Skip<byte>(420).Take<byte>(8).ToArray<byte>(),
-					0
-				);
-
-				if (type == 6) // Ethernet Adapter
-				{
-					var adapter = new LocalAreaConnection
-					{
-						Description = desc,
-						InstanceId = guid,
-						MacAddress = macAddr,
-						IpAddress = IPAddress.Parse(ipAddr),
-						SubnetMask = IPAddress.Parse(subnet),
-						Gateway = IPAddress.Parse(gateway),
-						DHCP = dhcp
-					};
-
-					adapters.Add(adapter);
-				}
+				throw new ArgumentException($"'{target}' is not an AmsNetId.", nameof(target));
 			}
 
-			await adapters.ForEachAsync(
-				async (adapter) =>
+			return netId;
+		}
+
+		private void Connect()
+		{
+			client = new AdsClient();
+
+			try
+			{
+				client.Connect(Target, AmsPort.SystemService);
+
+				if (!client.IsConnected)
 				{
-					// Get adapters name out of windows registry
-					adapter.Name = await GetAdaptersNameAsync(adapter.InstanceId);
+					throw new AdsException($"Could not connect to target {Target}.");
 				}
+			}
+			catch
+			{
+				// The client owns a socket. Leaking it would keep an ADS port allocated for the
+				// rest of the session.
+				client.Dispose();
+				client = null;
+
+				throw;
+			}
+		}
+
+		private AdsClient RequireClient()
+		{
+			if (client == null)
+			{
+				throw new ObjectDisposedException(nameof(NetworkManager));
+			}
+
+			return client;
+		}
+
+		/// <summary>
+		/// Returns every Ethernet adapter of the target, including its Windows connection name.
+		/// </summary>
+		public async Task<List<LocalAreaConnection>> ListConnectionsAsync(CancellationToken cancel)
+		{
+			AdsClient ads = RequireClient();
+
+			int count = await GetAdaptersCountAsync(cancel);
+
+			byte[] response = new byte[count * NetworkAdapterParser.RecordSize];
+
+			ResultReadBytes result = await ads.ReadAsync(701, 1, response.Length, cancel);
+
+			result.ThrowOnError();
+
+			result.Data.CopyTo(response);
+
+			var adapters = new List<LocalAreaConnection>(
+				NetworkAdapterParser.Parse(response, result.ReadBytes)
 			);
+
+			foreach (LocalAreaConnection adapter in adapters)
+			{
+				// The service reports the adapter description, not the name the user sees in the
+				// network settings. That name only exists in the registry of the target.
+				adapter.Name = await GetAdapterNameAsync(adapter.InstanceId, cancel);
+			}
 
 			return adapters;
 		}
 
-		public async Task<int> GetAdaptersCountAsync()
+		/// <summary>
+		/// Returns how many adapter records the target will report.
+		/// </summary>
+		public async Task<int> GetAdaptersCountAsync(
+			CancellationToken cancel = default(CancellationToken)
+		)
 		{
-			var count = 0;
+			ResultValue<int> result = await RequireClient().ReadAnyAsync<int>(701, 1, cancel);
 
-			var result = await _adsClient.ReadAnyAsync<int>(701, 1, CancellationToken.None);
 			result.ThrowOnError();
 
-			count = result.Value / 640;
-			if (count == 0)
-				throw new Exception(
-					string.Concat("Can not find any network adapter on target: ", Target.ToString())
-				);
+			int count = result.Value / NetworkAdapterParser.RecordSize;
+
+			if (count <= 0)
+			{
+				throw new AdsException($"Target {Target} reports no network adapter.");
+			}
 
 			return count;
 		}
 
-		private async Task<string> GetAdaptersNameAsync(Guid instanceId)
+		/// <summary>
+		/// Installs the real time driver on an adapter.
+		/// </summary>
+		public Task RteInstallAsync(
+			LocalAreaConnection adapter,
+			Version twinCatVersion,
+			CancellationToken cancel = default(CancellationToken)
+		)
 		{
-			var query = string.Concat(
-				@"SYSTEM\CurrentControlSet\Control\Network\{4D36E972-E325-11CE-BFC1-08002bE10318}\{",
-				instanceId.ToString().ToUpper(),
-				@"}\Connection"
-			);
-			var result = await TwinCAT.ProductivityTools.AdsRegistry.QueryValueAsync(
+			if (adapter == null)
+			{
+				throw new ArgumentNullException(nameof(adapter));
+			}
+
+			return RteInstallAsync(adapter.Name, twinCatVersion, cancel);
+		}
+
+		/// <summary>
+		/// Installs the real time driver on an adapter.
+		/// </summary>
+		/// <param name="adapterName">Windows connection name of the adapter.</param>
+		/// <param name="twinCatVersion">
+		/// TwinCAT version of the target. It decides where the tool lives, because 4026 moved the
+		/// system directory out of <c>C:\TwinCAT</c>.
+		/// </param>
+		/// <param name="cancel">Cancellation token.</param>
+		public Task RteInstallAsync(
+			string adapterName,
+			Version twinCatVersion,
+			CancellationToken cancel = default(CancellationToken)
+		)
+		{
+			if (string.IsNullOrWhiteSpace(adapterName))
+			{
+				throw new ArgumentException("An adapter name is required.", nameof(adapterName));
+			}
+
+			string directory = TargetPaths.SystemDirectory(twinCatVersion);
+
+			return RemoteControl.StartProcessAsync(
 				Target,
-				query,
-				"Name"
+				Path.Combine(directory, RteInstallExecutable),
+				directory,
+				$"-r installnic \"{adapterName}\"",
+				cancel
 			);
-			return result;
 		}
 
-		public Task RteInstallAsync(LocalAreaConnection adapter)
+		/// <summary>
+		/// Reads the connection name of an adapter from the registry of the target.
+		/// </summary>
+		private async Task<string> GetAdapterNameAsync(Guid instanceId, CancellationToken cancel)
 		{
-			return RteInstallAsync(adapter.Name);
-		}
+			// The class GUID below is the Windows network adapter class and is the same on every
+			// machine.
+			string key =
+				@"SYSTEM\CurrentControlSet\Control\Network\"
+				+ @"{4D36E972-E325-11CE-BFC1-08002bE10318}\"
+				+ instanceId.ToString("B").ToUpperInvariant()
+				+ @"\Connection";
 
-		public async Task RteInstallAsync(string adapterName)
-		{
-			var path = @"C:\TwinCAT\3.1\System\TcRteInstall.exe";
-			var dir = @"C:\TwinCAT\3.1\System";
-			var cmd = string.Concat("-r installnic \"", adapterName, "\"");
-
-			await RemoteControl.StartProcessAsync(Target, path, dir, cmd, CancellationToken.None);
-		}
-
-		~NetworkManager()
-		{
-			Dispose(false);
+			try
+			{
+				return await AdsRegistry.QueryValueAsync(Target, key, "Name", cancel);
+			}
+			catch (AdsErrorException)
+			{
+				// A hidden or half removed adapter has no connection key. Its description is still
+				// worth showing, so the listing continues without a name.
+				return string.Empty;
+			}
 		}
 
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				_adsClient?.Dispose();
-				_adsClient = null;
-			}
+			client?.Dispose();
+			client = null;
 		}
 	}
 }

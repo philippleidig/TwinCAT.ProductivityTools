@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Imaging;
@@ -44,33 +44,27 @@ namespace TwinCAT.ProductivityTools.InfoBars
 
 		protected override void OnActionItemClicked(object sender, InfoBarActionItemEventArgs args)
 		{
-			ThreadHelper
-				.JoinableTaskFactory.RunAsync(async () =>
+			BackgroundWork.Run(
+				async () =>
 				{
 					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-					try
+					ITcSysManager2 systemManager =
+						await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
+
+					if (systemManager == null)
 					{
-						ITcSysManager2 systemManager =
-							await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
-
-						if (systemManager == null)
-						{
-							return;
-						}
-
-						systemManager.EnableUseRelativeNetIds();
-
-						await VS.Solutions.SaveAsync();
-
-						await Report.ShowStatusAsync("Relative AmsNetIDs are now enabled.");
+						return;
 					}
-					catch (Exception ex)
-					{
-						await Report.FailureAsync("Failed to enable relative AmsNetIDs.", ex);
-					}
-				})
-				.FireAndForget();
+
+					systemManager.EnableUseRelativeNetIds();
+
+					await VS.Solutions.SaveAsync();
+
+					await Report.ShowStatusAsync("Relative AmsNetIDs are now enabled.");
+				},
+				"Failed to enable relative AmsNetIDs."
+			);
 
 			ThreadHelper.ThrowIfNotOnUIThread();
 			args.InfoBarUIElement?.Close();

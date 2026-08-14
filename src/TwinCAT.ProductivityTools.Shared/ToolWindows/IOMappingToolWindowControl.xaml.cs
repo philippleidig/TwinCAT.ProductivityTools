@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using Community.VisualStudio.Toolkit;
@@ -25,27 +25,21 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
-			ThreadHelper
-				.JoinableTaskFactory.RunAsync(async () =>
+			// The tool window can be reopened from the last IDE session before a solution is
+			// loaded. Reporting to the output window keeps that case from greeting the user with a
+			// modal dialog on every start.
+			BackgroundWork.Run(
+				async () =>
 				{
 					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-					try
-					{
-						ITcSysManager2 systemManager =
-							await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
+					ITcSysManager2 systemManager =
+						await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
 
-						await ViewModel.InitializeAsync(systemManager);
-					}
-					catch (Exception ex)
-					{
-						// The tool window can be reopened from the last IDE session before a
-						// solution is loaded. Reporting to the output window keeps that case from
-						// greeting the user with a modal dialog on every start.
-						await Report.FailureAsync("Failed to read the I/O mapping.", ex);
-					}
-				})
-				.FireAndForget();
+					await ViewModel.InitializeAsync(systemManager);
+				},
+				"Failed to read the I/O mapping."
+			);
 		}
 	}
 }

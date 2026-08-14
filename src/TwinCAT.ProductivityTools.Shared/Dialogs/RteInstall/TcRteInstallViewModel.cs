@@ -1,119 +1,175 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TwinCAT.Ads;
+using TwinCAT.ProductivityTools.Helpers;
+using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools
 {
-	class TcRteInstallViewModel : ObservableObject
+	/// <summary>
+	/// Lists the network adapters of a target and installs the real time driver on one of them.
+	/// </summary>
+	internal class TcRteInstallViewModel : ObservableObject
 	{
+		private readonly AmsNetId target;
+
+		/// <summary>
+		/// TwinCAT version of the target. It decides where <c>TcRteInstall.exe</c> lives, because
+		/// 4026 moved the system directory. It is read together with the adapter list.
+		/// </summary>
+		private Version targetVersion;
+
 		public TcRteInstallViewModel(string target)
 		{
-			Target = target;
+			Target = target ?? string.Empty;
 
-			try
+			AmsNetId netId;
+
+			if (AmsNetId.TryParse(Target, out netId))
 			{
-				if (AmsNetId.Local.Equals(target))
-				{
-					TargetName = "Local";
-				}
-				else
-				{
-					TargetName = AmsRouter
-						.ListRoutes()
-						.Where(x => x.NetId == Target.ToString())
-						.FirstOrDefault()
-						.Name;
-				}
+				this.target = netId;
 			}
-			catch { }
+
+			TargetName = ResolveName(this.target);
+
+			Connections = new ObservableCollection<LocalAreaConnection>();
 
 			InstallCommand = new AsyncRelayCommand(InstallAsync, CanInstall);
 			SearchCommand = new AsyncRelayCommand(SearchAsync, CanSearch);
-
-			Connections = new ObservableCollection<LocalAreaConnection>();
 		}
 
-		public async Task InitializeAsync()
+		public Task InitializeAsync()
 		{
-			await SearchAsync();
+			return SearchAsync();
 		}
 
-		public IAsyncRelayCommand InstallCommand { get; private set; }
-		public IAsyncRelayCommand SearchCommand { get; private set; }
+		public IAsyncRelayCommand InstallCommand { get; }
 
-		private bool _isBusy;
+		public IAsyncRelayCommand SearchCommand { get; }
+
+		public ObservableCollection<LocalAreaConnection> Connections { get; }
+
+		private bool isBusy;
+
 		public bool IsBusy
 		{
-			get => _isBusy;
-			private set { _isBusy = value; }
-		}
-
-		private ObservableCollection<LocalAreaConnection> _connectionsList;
-		public ObservableCollection<LocalAreaConnection> Connections
-		{
-			get => _connectionsList;
+			get => isBusy;
 			private set
 			{
-				_connectionsList = value;
-				OnPropertyChanged("Connections");
+				if (SetProperty(ref isBusy, value))
+				{
+					// The commands are bound to buttons that have to grey out while a request is
+					// running. Without this the user can start a second install on top of the
+					// first one.
+					InstallCommand.NotifyCanExecuteChanged();
+					SearchCommand.NotifyCanExecuteChanged();
+				}
 			}
 		}
 
-		private LocalAreaConnection _selectedItem;
+		private LocalAreaConnection selectedItem;
+
 		public LocalAreaConnection SelectedItem
 		{
-			get => _selectedItem;
+			get => selectedItem;
 			set
 			{
-				_selectedItem = value;
-				OnPropertyChanged("SelectedItem");
+				if (SetProperty(ref selectedItem, value))
+				{
+					InstallCommand.NotifyCanExecuteChanged();
+				}
 			}
 		}
 
-		private string _target = string.Empty;
+		private string targetText = string.Empty;
+
 		public string Target
 		{
-			get => _target;
-			private set
-			{
-				_target = value;
-				OnPropertyChanged("Target");
-			}
+			get => targetText;
+			private set => SetProperty(ref targetText, value);
 		}
 
-		private string _targetName = string.Empty;
+		private string targetName = string.Empty;
+
 		public string TargetName
 		{
-			get => _targetName;
-			private set
+			get => targetName;
+			private set => SetProperty(ref targetName, value);
+		}
+
+		private string status = string.Empty;
+
+		public string Status
+		{
+			get => status;
+			private set => SetProperty(ref status, value);
+		}
+
+		/// <summary>
+		/// Resolves the route name of the target, falling back to its AmsNetId.
+		/// </summary>
+		private static string ResolveName(AmsNetId netId)
+		{
+			if (netId == null)
 			{
-				_targetName = value;
-				OnPropertyChanged("TargetName");
+				return string.Empty;
+			}
+
+			if (netId.Equals(AmsNetId.Local))
+			{
+				return "Local";
+			}
+
+			try
+			{
+				string name = AmsRouter
+					.ListRoutes()
+					.FirstOrDefault(route => netId.ToString().Equals(route.NetId))
+					?.Name;
+
+				return string.IsNullOrEmpty(name) ? netId.ToString() : name;
+			}
+			catch (Exception)
+			{
+				// The static routes file is optional and may be unreadable. The AmsNetId is a
+				// perfectly usable caption on its own.
+				return netId.ToString();
 			}
 		}
 
 		private async Task InstallAsync()
 		{
+			LocalAreaConnection adapter = SelectedItem;
+
+			if (target == null || adapter == null)
+			{
+				return;
+			}
+
 			try
 			{
 				IsBusy = true;
+				Status = $"Installing the real time driver on {adapter.Name}...";
 
-				using (var nm = new NetworkManager(Target))
+				using (var manager = new NetworkManager(target))
 				{
-					await nm.RteInstallAsync(SelectedItem);
+					await manager.RteInstallAsync(adapter, targetVersion, CancellationToken.None);
 				}
+
+				Status =
+					$"The real time driver was requested for {adapter.Name}. "
+					+ "The target applies it on its next restart.";
+			}
+			catch (Exception exception)
+			{
+				Status = "The installation failed.";
+
+				await Report.FailureAsync("Failed to install the real time driver.", exception);
 			}
 			finally
 			{
@@ -123,29 +179,51 @@ namespace TwinCAT.ProductivityTools
 
 		private bool CanInstall()
 		{
-			return !IsBusy;
+			return !IsBusy && target != null && SelectedItem != null;
 		}
 
 		private async Task SearchAsync()
 		{
+			if (target == null)
+			{
+				Status = $"'{Target}' is not a valid AmsNetId.";
+				return;
+			}
+
 			try
 			{
-				Connections.Clear();
 				IsBusy = true;
+				Status = "Reading the network configuration...";
 
-				using (var nm = new NetworkManager(Target))
+				Connections.Clear();
+				SelectedItem = null;
+
+				DeviceInfo device = await RemoteControl.GetDeviceInfoAsync(
+					target,
+					CancellationToken.None
+				);
+
+				targetVersion = device.TwinCATVersion;
+
+				using (var manager = new NetworkManager(target))
 				{
-					var connections = await nm.ListConnectionsAsync(CancellationToken.None);
-
-					foreach (var conn in connections)
+					foreach (
+						LocalAreaConnection connection in await manager.ListConnectionsAsync(
+							CancellationToken.None
+						)
+					)
 					{
-						Connections.Add(conn);
+						Connections.Add(connection);
 					}
 				}
+
+				Status = $"{Connections.Count} adapter(s) found.";
 			}
-			catch (Exception ex)
+			catch (Exception exception)
 			{
-				MessageBox.Show(ex.Message);
+				Status = "The network configuration could not be read.";
+
+				await Report.FailureAsync("Failed to read the network configuration.", exception);
 			}
 			finally
 			{
@@ -155,7 +233,7 @@ namespace TwinCAT.ProductivityTools
 
 		private bool CanSearch()
 		{
-			return !IsBusy;
+			return !IsBusy && target != null;
 		}
 	}
 }

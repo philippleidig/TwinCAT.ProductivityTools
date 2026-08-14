@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -25,22 +25,10 @@ namespace TwinCAT.ProductivityTools
 		// dialog.
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
-			Microsoft
-				.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-				{
-					try
-					{
-						await viewModel.InitializeAsync();
-					}
-					catch (System.Exception ex)
-					{
-						await TwinCAT.ProductivityTools.Helpers.Report.FailureAsync(
-							"Failed to read the target information.",
-							ex
-						);
-					}
-				})
-				.FireAndForget();
+			Helpers.BackgroundWork.Run(
+				() => viewModel.InitializeAsync(),
+				"Failed to read the target information."
+			);
 		}
 
 		private DeviceInfoViewModel viewModel;

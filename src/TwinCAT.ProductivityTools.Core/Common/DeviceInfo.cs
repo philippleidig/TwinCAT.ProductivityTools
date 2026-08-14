@@ -17,6 +17,6 @@ namespace TwinCAT.ProductivityTools
 		public string ImageOsName { get; set; } = string.Empty;
 		public string ImageOsVersion { get; set; } = string.Empty;
 
-		public Version TwinCATVersion { get; set; }
+		public Version TwinCATVersion { get; set; } = new Version(0, 0, 0);
 	}
 }

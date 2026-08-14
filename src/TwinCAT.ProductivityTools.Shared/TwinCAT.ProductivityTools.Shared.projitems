@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\PlcTextRewriteCommandBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\DeviceInfoCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\TargetCommandBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\BackgroundWork.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Report.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\UndoContextScope.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plc\PlcTextRewriter.cs" />

@@ -16,6 +16,15 @@ namespace TwinCAT.ProductivityTools.Helpers
 	/// </remarks>
 	internal static class Report
 	{
+		/// <summary>
+		/// Reports a failure from a synchronous context, for example a <c>catch</c> block of an
+		/// event handler that cannot be made asynchronous.
+		/// </summary>
+		public static void Failure(string summary, Exception exception, bool silent = false)
+		{
+			BackgroundWork.Run(() => FailureAsync(summary, exception, silent), summary);
+		}
+
 		public static async Task FailureAsync(
 			string summary,
 			Exception exception,

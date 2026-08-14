@@ -50,7 +50,7 @@ namespace TwinCAT.ProductivityTools.Helpers
 		private readonly (Regex Merged, Regex[] Individual) Positives;
 		private readonly (Regex Merged, Regex[] Individual) Negatives;
 
-		private FileFilter(IEnumerable<string> filters)
+		public FileFilter(IEnumerable<string> filters)
 		{
 			(Positives, Negatives) = Parse(filters);
 		}

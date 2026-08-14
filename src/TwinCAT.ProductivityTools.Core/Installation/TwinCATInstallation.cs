@@ -44,8 +44,8 @@ namespace TwinCAT.ProductivityTools.Installation
 	/// </remarks>
 	public sealed class TwinCATInstallation : ITwinCATInstallation
 	{
-		internal const string RegistrySubKey = @"SOFTWARE\Beckhoff\TwinCAT3";
-		internal const string SystemRegistrySubKey = @"SOFTWARE\Beckhoff\TwinCAT3\System";
+		public const string RegistrySubKey = @"SOFTWARE\Beckhoff\TwinCAT3";
+		public const string SystemRegistrySubKey = @"SOFTWARE\Beckhoff\TwinCAT3\System";
 
 		/// <summary>First build that uses the reorganized 4026 directory layout.</summary>
 		public const int FirstReorganizedBuild = 4026;

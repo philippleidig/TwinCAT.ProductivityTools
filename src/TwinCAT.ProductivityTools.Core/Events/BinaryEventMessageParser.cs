@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using TwinCAT.ProductivityTools.DataTypes;
@@ -19,14 +19,14 @@ namespace TwinCAT.ProductivityTools.Events
 	/// </summary>
 	public sealed class BinaryEventMessageParser : IEventMessageParser
 	{
-		internal const int SenderLength = 16;
-		internal const int HeaderLength = 8 + 4 + 4 + SenderLength + 4;
+		public const int SenderLength = 16;
+		public const int HeaderLength = 8 + 4 + 4 + SenderLength + 4;
 
 		/// <summary>
 		/// A logger message is a few hundred characters at most. The cap keeps a corrupt length
 		/// field from allocating hundreds of megabytes inside the notification callback.
 		/// </summary>
-		internal const int MaximumMessageLength = 64 * 1024;
+		public const int MaximumMessageLength = 64 * 1024;
 
 		public EventMessage Parse(byte[] eventData)
 		{

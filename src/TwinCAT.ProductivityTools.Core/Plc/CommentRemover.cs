@@ -53,6 +53,13 @@ namespace TwinCAT.ProductivityTools.Plc
 					}
 					else
 					{
+						// The line breaks inside a comment are kept so that the code below the
+						// comment stays on the line number the compiler will report.
+						if (current == '\r' || current == '\n')
+						{
+							result.Append(current);
+						}
+
 						index++;
 					}
 

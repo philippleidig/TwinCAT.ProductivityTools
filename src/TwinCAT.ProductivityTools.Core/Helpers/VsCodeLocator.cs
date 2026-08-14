@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,10 +26,10 @@ namespace TwinCAT.ProductivityTools.Helpers
 	/// </summary>
 	public sealed class VsCodeLocator : IVsCodeLocator
 	{
-		internal const string ShellRegistryKey = @"SOFTWARE\Classes\*\shell\VSCode";
-		internal const string ShellRegistryValue = "Icon";
-		internal const string UserInstallationSuffix = @"Programs\Microsoft VS Code";
-		internal const string ExecutableName = "Code.exe";
+		public const string ShellRegistryKey = @"SOFTWARE\Classes\*\shell\VSCode";
+		public const string ShellRegistryValue = "Icon";
+		public const string UserInstallationSuffix = @"Programs\Microsoft VS Code";
+		public const string ExecutableName = "Code.exe";
 
 		private readonly IRegistryProvider registry;
 		private readonly IFileSystemProbe fileSystem;

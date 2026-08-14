@@ -66,6 +66,13 @@ jobs:
           --no-restore
           --filter "Category!=E2E"
 
+      - name: Integration test
+        run: >
+          dotnet test tests/TwinCAT.ProductivityTools.Integration.Tests/TwinCAT.ProductivityTools.Integration.Tests.csproj
+          --configuration Release
+          --no-restore
+          --filter "Category!=E2E"
+
       - name: Build the installer
         shell: pwsh
         env:

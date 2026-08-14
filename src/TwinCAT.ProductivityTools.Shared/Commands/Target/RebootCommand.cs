@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using Community.VisualStudio.Toolkit;
 using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Helpers;
@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 namespace TwinCAT.ProductivityTools.Commands
 {
 	/// <summary>Reboots the target system.</summary>
-	[Command(PackageIds.RestartCommandId)]
+	[Command(PackageIds.RebootCommandId)]
 	internal sealed class RebootCommand : TargetCommandBase<RebootCommand>
 	{
 		protected override string OperationName => "Reboot";

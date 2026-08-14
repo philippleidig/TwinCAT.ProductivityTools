@@ -65,6 +65,16 @@ jobs:
           --results-directory artifacts/test-results
           --filter "Category!=E2E"
 
+      - name: Integration test
+        run: >
+          dotnet test tests/TwinCAT.ProductivityTools.Integration.Tests/TwinCAT.ProductivityTools.Integration.Tests.csproj
+          --configuration Release
+          --no-restore
+          --logger "trx;LogFileName=integration.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory artifacts/test-results
+          --filter "Category!=E2E"
+
       - name: Report coverage
         if: always()
         uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11

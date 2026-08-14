@@ -68,7 +68,7 @@
       </Button>
       
       <!-- Restart -->
-      <Button guid="ProductivityToolsCmdSet" id="RestartCommandId" priority="0x0002" type="Button">
+      <Button guid="ProductivityToolsCmdSet" id="RebootCommandId" priority="0x0002" type="Button">
         <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
         <Icon guid="CommandImages" id="RestartMoniker" />
         <CommandFlag>DefaultDisabled</CommandFlag>
@@ -139,7 +139,7 @@
         </Strings>
       </Button>
       <!-- Restart -->
-      <Button guid="ProductivityToolsCmdSet" id="RestartCommandId" priority="0x0100" type="Button">
+      <Button guid="ProductivityToolsCmdSet" id="RebootCommandId" priority="0x0100" type="Button">
         <Parent guid="ProductivityToolsCmdSet" id="ToolbarGroup" />
               <Icon guid="CommandImages" id="RestartMoniker" />
         <CommandFlag>DefaultDisabled</CommandFlag>
@@ -199,7 +199,7 @@
         </Button>
 
         <!-- TwinCAT IO Mapping - Context Menu - Show IO Mapping Tool Window -->
-        <Button guid="ProductivityToolsCmdSet" id="ShowMappingToolWindowCommandId" priority="0x0000" type="Button">
+        <Button guid="ProductivityToolsCmdSet" id="ShowIOMappingToolWindowCommandId" priority="0x0000" type="Button">
             <Strings>
                 <ButtonText>Show IO Mappings</ButtonText>
             </Strings>
@@ -270,7 +270,7 @@
             <Parent guid="TwinCATXaeProjectCmdSet" id="TwinCATIOMappingContextMenuId" />
         </CommandPlacement>
 
-        <CommandPlacement guid="ProductivityToolsCmdSet" id="ShowMappingToolWindowCommandId" priority="0x0000">
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="ShowIOMappingToolWindowCommandId" priority="0x0000">
             <Parent guid="ProductivityToolsCmdSet" id="TwinCATIOMappingContextMenuGroup" />
         </CommandPlacement>
 
@@ -369,7 +369,7 @@
         
          <!-- Commands -->
         <IDSymbol name="ShutdownCommandId" value="0x0100" />
-        <IDSymbol name="RestartCommandId" value="0x0101" />
+        <IDSymbol name="RebootCommandId" value="0x0101" />
         <IDSymbol name="DeviceInfoCommandId" value="0x0102" />
         <IDSymbol name="RemoteDesktopCommandId" value="0x0103" />
         <IDSymbol name="RteInstallCommandId" value="0x0104" />
@@ -385,7 +385,7 @@
         <IDSymbol name="DeleteBuildArtifactsOnCleanCommandId" value="0x0324"/>
         
         
-        <IDSymbol name="ShowMappingToolWindowCommandId" value="0x0522"/>
+        <IDSymbol name="ShowIOMappingToolWindowCommandId" value="0x0522"/>
 
     </GuidSymbol>
 

@@ -6,7 +6,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
-	[Command(PackageIds.ShowMappingToolWindowCommandId)]
+	[Command(PackageIds.ShowIOMappingToolWindowCommandId)]
 	internal sealed class ShowIOMappingToolWindowCommand
 		: BaseCommand<ShowIOMappingToolWindowCommand>
 	{

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
 using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Routing;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
@@ -42,7 +43,7 @@ namespace TwinCAT.ProductivityTools.Commands
 			{
 				ITcSysManager2 systemManager = VS.Solutions.GetActiveTwinCATProjectSystemManager();
 
-				hasTarget = AmsNetId.TryParse(systemManager?.GetTargetNetId(), out AmsNetId _);
+				hasTarget = AmsNetIdParser.IsValid(systemManager?.GetTargetNetId());
 			}
 			catch (Exception)
 			{
@@ -71,7 +72,7 @@ namespace TwinCAT.ProductivityTools.Commands
 
 			string targetName = systemManager.GetTargetNetId();
 
-			if (!AmsNetId.TryParse(targetName, out AmsNetId target))
+			if (!AmsNetIdParser.TryParse(targetName, out AmsNetId target))
 			{
 				await VS.MessageBox.ShowErrorAsync(
 					Vsix.Name,

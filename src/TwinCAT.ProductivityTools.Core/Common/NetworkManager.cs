@@ -39,7 +39,7 @@ namespace TwinCAT.ProductivityTools
 		{
 			AmsNetId netId;
 
-			if (!AmsNetId.TryParse(target, out netId))
+			if (!Routing.AmsNetIdParser.TryParse(target, out netId))
 			{
 				throw new ArgumentException($"'{target}' is not an AmsNetId.", nameof(target));
 			}

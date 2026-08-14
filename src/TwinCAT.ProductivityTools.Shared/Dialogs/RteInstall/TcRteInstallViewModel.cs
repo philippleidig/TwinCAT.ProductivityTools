@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TwinCAT.Ads;
 using TwinCAT.ProductivityTools.Helpers;
+using TwinCAT.ProductivityTools.Routing;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools
@@ -30,7 +31,7 @@ namespace TwinCAT.ProductivityTools
 
 			AmsNetId netId;
 
-			if (AmsNetId.TryParse(Target, out netId))
+			if (AmsNetIdParser.TryParse(Target, out netId))
 			{
 				this.target = netId;
 			}

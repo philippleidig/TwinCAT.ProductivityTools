@@ -13,7 +13,7 @@ using Task = System.Threading.Tasks.Task;
 namespace TwinCAT.ProductivityTools.Commands
 {
 	[Command(PackageIds.OpenInVsCodeCommandId)]
-	internal sealed class OpenVsCodeCommand : BaseCommand<OpenVsCodeCommand>
+	internal sealed class OpenInVsCodeCommand : BaseCommand<OpenInVsCodeCommand>
 	{
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{

@@ -17,41 +17,54 @@ namespace TwinCAT.ProductivityTools.Commands
 	{
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{
-			var dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-			var selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			string filePath = selectedItem.Properties.Item("FullPath").Value.ToString();
+			var dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+			ProjectItem selectedItem = dte.GetSelectedProjectItem();
 
 			if (!(selectedItem?.Object is ITcSmTreeItem treeItem))
 			{
 				return;
 			}
 
+			string filePath = selectedItem.Properties?.Item("FullPath")?.Value?.ToString();
+
+			if (string.IsNullOrEmpty(filePath))
+			{
+				await VS.MessageBox.ShowErrorAsync(
+					Vsix.Name,
+					"The selected item does not have a file system path."
+				);
+				return;
+			}
+
 			if (treeItem.IsPlcProjectFolder())
 			{
-				await OpenFolderInVsAsync(filePath);
+				await OpenFolderInVsCodeAsync(filePath);
 			}
-			else 
+			else
 			{
-				await OpenFileInVsAsync(filePath);
+				await OpenFileInVsCodeAsync(filePath);
 			}
 		}
 
-		private async Task OpenFileInVsAsync(string path)
+		private async Task OpenFileInVsCodeAsync(string path)
 		{
-			if (!File.Exists(path)) 
+			if (!File.Exists(path))
 			{
-				// await VS.MessageBox.ShowErrorAsync();
+				await VS.MessageBox.ShowErrorAsync(Vsix.Name, "File not found: " + path);
+				return;
 			}
 
 			OpenVsCode(path);
 		}
 
-		private async Task OpenFolderInVsAsync(string path)
+		private async Task OpenFolderInVsCodeAsync(string path)
 		{
 			if (!Directory.Exists(path))
 			{
-				// await VS.MessageBox.ShowErrorAsync();
+				await VS.MessageBox.ShowErrorAsync(Vsix.Name, "Folder not found: " + path);
+				return;
 			}
 
 			OpenVsCode(path);
@@ -62,7 +75,7 @@ namespace TwinCAT.ProductivityTools.Commands
 			EnsurePathExist();
 			bool isDirectory = Directory.Exists(path);
 
-			var args = isDirectory ? "." : path;
+			var args = isDirectory ? "." : $"\"{path}\"";
 
 			var start = new System.Diagnostics.ProcessStartInfo()
 			{

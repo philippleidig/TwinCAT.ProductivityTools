@@ -48,7 +48,30 @@ namespace TwinCAT.ProductivityTools
 
 			await this.RegisterServicesAsync();
 			await this.RegisterCommandsAsync();
-			await this.RegisterInfoBarsAsync();
+
+			// An info bar only makes a recommendation. A failure while evaluating it must never
+			// abort package initialization, because a failed SetSite disables every command of
+			// this package for the whole IDE session.
+			await this.SafelyAsync(this.RegisterInfoBarsAsync);
+		}
+
+		private async Task SafelyAsync(Func<Task> action)
+		{
+			try
+			{
+				await action();
+			}
+			catch (Exception ex)
+			{
+				await this.LogFailureAsync(ex);
+			}
+		}
+
+		private async Task LogFailureAsync(Exception exception)
+		{
+			await JoinableTaskFactory.SwitchToMainThreadAsync();
+
+			ActivityLog.TryLogError(nameof(ProductivityToolsPackage), exception.ToString());
 		}
 
 		private async Task RegisterServicesAsync()

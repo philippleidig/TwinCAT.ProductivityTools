@@ -44,6 +44,7 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\RteInstall\TcRteInstallViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\AsyncPackageExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DteExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\AdsRoute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\AmsRouter.cs" />

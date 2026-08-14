@@ -25,7 +25,7 @@ namespace TwinCAT.ProductivityTools.Commands
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
 			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-			EnvDTE.ProjectItem selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			EnvDTE.ProjectItem selectedItem = dte.GetSelectedProjectItem();
 
 			if (selectedItem == null || !(selectedItem.Object is ITcPlcPou plcPou))
 				return;

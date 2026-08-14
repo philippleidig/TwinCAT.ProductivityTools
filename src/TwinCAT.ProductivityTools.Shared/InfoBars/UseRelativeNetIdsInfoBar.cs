@@ -16,6 +16,11 @@ namespace TwinCAT.ProductivityTools.InfoBars
 			ITcSysManager2 systemManager =
 				await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
 
+			if (systemManager == null)
+			{
+				return false;
+			}
+
 			bool isRelativeNetIdsEnabled = systemManager.IsUseRelativeNetIdsEnabled();
 
 			return !isRelativeNetIdsEnabled;

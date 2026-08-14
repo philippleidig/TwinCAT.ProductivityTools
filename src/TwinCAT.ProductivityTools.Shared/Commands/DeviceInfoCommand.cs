@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
@@ -29,6 +29,7 @@ namespace TwinCAT.ProductivityTools.Commands
 					"TwinCAT ProductivityTools",
 					"Solution does not contain a TwinCAT XAE project!"
 				);
+				return;
 			}
 
 			var target = systemManager.GetTargetNetId();

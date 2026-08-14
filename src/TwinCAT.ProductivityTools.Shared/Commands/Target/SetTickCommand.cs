@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -33,6 +33,7 @@ namespace TwinCAT.ProductivityTools.Commands
 					"TwinCAT ProductivityTools",
 					"Solution does not contain a TwinCAT XAE project!"
 				);
+				return;
 			}
 
 			var target = systemManager.GetTargetNetId();

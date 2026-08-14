@@ -14,14 +14,15 @@ namespace TwinCAT.ProductivityTools.Commands
 	{
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			EnvDTE.DTE dte = VS.GetRequiredService<DTE, DTE>();
-			EnvDTE.ProjectItem selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			ITcSmTreeItem treeItem = dte.GetSelectedObject<ITcSmTreeItem>();
 
-			if (selectedItem == null || !(selectedItem.Object is ITcSmTreeItem treeItem))
-				return;
+			bool isEtherCATMaster = treeItem != null && treeItem.IsEtherCATMaster();
 
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && treeItem.IsEtherCATMaster();
-			Command.Enabled = treeItem.IsEtherCATMaster();
+			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && isEtherCATMaster;
+			Command.Enabled = isEtherCATMaster;
 		}
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)

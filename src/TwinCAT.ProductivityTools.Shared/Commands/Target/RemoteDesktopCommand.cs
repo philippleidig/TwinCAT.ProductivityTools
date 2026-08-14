@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,17 +16,20 @@ namespace TwinCAT.ProductivityTools.Commands
 	[Command(PackageIds.RemoteDesktopCommandId)]
 	internal sealed class RemoteDesktopCommand : BaseCommand<RemoteDesktopCommand>
 	{
-		protected override async void BeforeQueryStatus(EventArgs e)
+		protected override void BeforeQueryStatus(EventArgs e)
 		{
-			ITcSysManager2 systemManager =
-				await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			ITcSysManager2 systemManager = VS.Solutions.GetActiveTwinCATProjectSystemManager();
 
 			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = AmsNetId.Local.ToString() == systemManager.GetTargetNetId();
+			Command.Enabled = !string.IsNullOrEmpty(systemManager?.GetTargetNetId());
 		}
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
 			ITcSysManager2 systemManager =
 				await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
 
@@ -36,19 +39,26 @@ namespace TwinCAT.ProductivityTools.Commands
 					"TwinCAT ProductivityTools",
 					"Solution does not contain a TwinCAT XAE project!"
 				);
+				return;
 			}
 
-			var target = systemManager.GetTargetNetId();
-			AmsNetId.TryParse(target, out AmsNetId amsnetid);
+			string target = systemManager.GetTargetNetId();
 
-			var ipAddress = AmsRouter
+			string ipAddress = AmsRouter
 				.ListRoutes()
-				.Where(route => route.NetId == target)
-				.FirstOrDefault()
-				.Address;
+				.FirstOrDefault(route => route.NetId == target)
+				?.Address;
 
-			if (!string.IsNullOrEmpty(ipAddress))
-				RemoteDesktop.Connect(ipAddress);
+			if (string.IsNullOrEmpty(ipAddress))
+			{
+				await VS.MessageBox.ShowErrorAsync(
+					"TwinCAT ProductivityTools",
+					"No route with an IP address was found for target <" + target + ">."
+				);
+				return;
+			}
+
+			RemoteDesktop.Connect(ipAddress);
 		}
 	}
 }

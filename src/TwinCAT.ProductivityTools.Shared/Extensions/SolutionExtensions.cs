@@ -52,6 +52,31 @@ namespace TwinCAT.ProductivityTools.Extensions
 		{
 			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
 
+			return GetActiveTwinCATProjectSystemManager(dte);
+		}
+
+		/// <summary>
+		/// Synchronous counterpart of <see cref="GetActiveTwinCATProjectSystemManagerAsync"/>.
+		/// Required by <c>BeforeQueryStatus</c>, which the shell calls synchronously while the
+		/// menu is being built. An asynchronous lookup would complete after the menu item has
+		/// already been rendered and therefore could never affect its visibility or enabled state.
+		/// </summary>
+		public static ITcSysManager2 GetActiveTwinCATProjectSystemManager(this Solutions solutions)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			if (!HierarchyUtilities.IsSolutionOpen)
+			{
+				return null;
+			}
+
+			EnvDTE.DTE dte = VS.GetRequiredService<DTE, DTE>();
+
+			return GetActiveTwinCATProjectSystemManager(dte);
+		}
+
+		private static ITcSysManager2 GetActiveTwinCATProjectSystemManager(EnvDTE.DTE dte)
+		{
 			if (
 				dte?.ActiveSolutionProjects is Array activeSolutionProjects
 				&& activeSolutionProjects?.Length > 0

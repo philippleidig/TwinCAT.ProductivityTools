@@ -15,14 +15,15 @@ namespace TwinCAT.ProductivityTools.Commands
 	{
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			var dte = VS.GetRequiredService<DTE, DTE>();
-			var selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			ITcSmTreeItem treeItem = dte.GetSelectedObject<ITcSmTreeItem>();
 
-			if (!(selectedItem?.Object is ITcSmTreeItem treeItem))
-				return;
+			bool isNcCamTableSlave = treeItem != null && treeItem.IsNcCamTableSlave();
 
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && treeItem.IsNcCamTableSlave();
-			Command.Enabled = treeItem.IsNcCamTableSlave();
+			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && isNcCamTableSlave;
+			Command.Enabled = isNcCamTableSlave;
 		}
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)

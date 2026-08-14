@@ -14,17 +14,15 @@ namespace TwinCAT.ProductivityTools.Commands.PLC
 	{
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			var dte = VS.GetRequiredService<DTE, DTE>();
-			var selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			ITcSmTreeItem treeItem = dte.GetSelectedObject<ITcSmTreeItem>();
 
-			if (!(selectedItem?.Object is ITcSmTreeItem treeItem))
-			{
-				return;
-			}
+			bool isPlcProjectFolder = treeItem != null && treeItem.IsPlcProjectFolder();
 
-			Command.Visible =
-				VS.Solutions.IsTwinCATProjectLoaded() && treeItem.IsPlcProjectFolder();
-			Command.Enabled = treeItem.IsPlcProjectFolder();
+			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && isPlcProjectFolder;
+			Command.Enabled = isPlcProjectFolder;
 		}
 
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
@@ -32,11 +30,11 @@ namespace TwinCAT.ProductivityTools.Commands.PLC
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
 			var dte = VS.GetRequiredService<DTE, DTE>();
-			var selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			ProjectItem selectedItem = dte.GetSelectedProjectItem();
 
-			string filePath = selectedItem.Properties.Item("FullPath").Value.ToString();
+			string filePath = selectedItem?.Properties?.Item("FullPath")?.Value?.ToString();
 
-			if (!Directory.Exists(filePath))
+			if (string.IsNullOrEmpty(filePath) || !Directory.Exists(filePath))
 			{
 				return;
 			}

@@ -24,7 +24,9 @@ namespace TwinCAT.ProductivityTools.Tests.Io
 		{
 			IDictionary<string, List<Variable>> result = parser.Parse(Mapping);
 
-			result.Should().ContainKey("TIPC^Untitled1^Untitled1 Instance^PlcTask Inputs^MAIN.bInput");
+			result
+				.Should()
+				.ContainKey("TIPC^Untitled1^Untitled1 Instance^PlcTask Inputs^MAIN.bInput");
 			result.Should().HaveCount(2);
 		}
 
@@ -37,9 +39,7 @@ namespace TwinCAT.ProductivityTools.Tests.Io
 
 			variable
 				.Name.Should()
-				.Be(
-					"TIID^Device 1 (EtherCAT)^Term 1 (EK1100)^Term 2 (EL1008)^Channel 1^Input"
-				);
+				.Be("TIID^Device 1 (EtherCAT)^Term 1 (EK1100)^Term 2 (EL1008)^Channel 1^Input");
 			variable.Path.Should().Be("Channel 1^Input");
 			variable.Size.Should().Be(1);
 		}
@@ -47,7 +47,8 @@ namespace TwinCAT.ProductivityTools.Tests.Io
 		[Fact]
 		public void Prefers_the_offset_of_the_first_owner()
 		{
-			parser.Parse(Mapping)["TIPC^Untitled1^Untitled1 Instance^PlcTask Inputs^MAIN.bInput"][0]
+			parser
+				.Parse(Mapping)["TIPC^Untitled1^Untitled1 Instance^PlcTask Inputs^MAIN.bInput"][0]
 				.Offset.Should()
 				.Be(0);
 		}
@@ -55,7 +56,8 @@ namespace TwinCAT.ProductivityTools.Tests.Io
 		[Fact]
 		public void Falls_back_to_the_offset_of_the_second_owner()
 		{
-			parser.Parse(Mapping)["TIPC^Untitled1^Untitled1 Instance^PlcTask Inputs^MAIN.bSecond"][0]
+			parser
+				.Parse(Mapping)["TIPC^Untitled1^Untitled1 Instance^PlcTask Inputs^MAIN.bSecond"][0]
 				.Offset.Should()
 				.Be(8);
 		}

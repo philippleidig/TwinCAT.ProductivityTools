@@ -77,7 +77,10 @@ namespace TwinCAT.ProductivityTools.Tests.Plc
 
 			ProjectFreezeXml.FreezePlcProject(document, "3.5.19.20").Should().BeTrue();
 
-			document.Descendants().Should().ContainSingle(e => e.Name.LocalName == "CompilerVersion");
+			document
+				.Descendants()
+				.Should()
+				.ContainSingle(e => e.Name.LocalName == "CompilerVersion");
 			CompilerVersion(document).Should().Be("3.5.19.20");
 		}
 

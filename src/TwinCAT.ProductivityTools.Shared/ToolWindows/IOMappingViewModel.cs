@@ -1,19 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
+using TwinCAT.ProductivityTools.Helpers;
 using TwinCAT.ProductivityTools.Io;
+using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.ToolWindows
 {
 	public class TreeNode
 	{
 		public string Name { get; set; }
+
 		public ObservableCollection<TreeNode> Children { get; set; } =
 			new ObservableCollection<TreeNode>();
 
@@ -24,44 +30,46 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 	{
 		public IOMappingViewModel()
 		{
-			_reloadCommand = new RelayCommand(Reload);
-
-			_selectCommand = new RelayCommand<TreeNode>(OnTreeItemSelected);
-			_doubleClickCommand = new RelayCommand<TreeNode>(OnTreeItemDoubleClicked);
-			_goToDestinationCommand = new RelayCommand(GoToDestination);
-			_goToSourceCommand = new RelayCommand(GoToSource);
+			ReloadCommand = new RelayCommand(Reload);
+			CopyCommand = new RelayCommand<TreeNode>(Copy);
+			ExportCommand = new RelayCommand(Export);
 		}
 
 		private ITcSysManager3 _systemManager;
 
-		private RelayCommand _reloadCommand;
-		public ICommand ReloadCommand => _reloadCommand;
+		public ICommand ReloadCommand { get; }
 
-		private RelayCommand<TreeNode> _selectCommand;
-		public ICommand SelectCommand => _selectCommand;
+		public ICommand CopyCommand { get; }
 
-		private RelayCommand<TreeNode> _doubleClickCommand;
-		public ICommand DoubleClickCommand => _doubleClickCommand;
+		public ICommand ExportCommand { get; }
 
-		private RelayCommand _goToDestinationCommand;
-		public ICommand GoToDestinationCommand => _goToDestinationCommand;
+		private ObservableCollection<TreeNode> _treeData = new ObservableCollection<TreeNode>();
 
-		private RelayCommand _goToSourceCommand;
-		public ICommand GoToSourceCommand => _goToSourceCommand;
-
-		public ObservableCollection<TreeNode> TreeData { get; set; }
-
-		public ObservableCollection<TreeNode> FilteredTreeData { get; set; }
-
-		private Dictionary<string, List<Variable>> _variables;
-
-		public Dictionary<string, List<Variable>> Variables
+		public ObservableCollection<TreeNode> TreeData
 		{
-			get => _variables;
-			set => SetProperty(ref _variables, value);
+			get => _treeData;
+			private set => SetProperty(ref _treeData, value);
 		}
 
-		private string _searchQuery;
+		private ObservableCollection<TreeNode> _filteredTreeData =
+			new ObservableCollection<TreeNode>();
+
+		public ObservableCollection<TreeNode> FilteredTreeData
+		{
+			get => _filteredTreeData;
+			private set => SetProperty(ref _filteredTreeData, value);
+		}
+
+		private IDictionary<string, List<Variable>> _variables =
+			new Dictionary<string, List<Variable>>();
+
+		public IDictionary<string, List<Variable>> Variables
+		{
+			get => _variables;
+			private set => SetProperty(ref _variables, value);
+		}
+
+		private string _searchQuery = string.Empty;
 
 		public string SearchQuery
 		{
@@ -77,51 +85,131 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 			}
 		}
 
+		private string _status = string.Empty;
+
+		public string Status
+		{
+			get => _status;
+			private set => SetProperty(ref _status, value);
+		}
+
 		public void Reload()
 		{
-			string xmlMappingInfo = _systemManager?.ProduceMappingInfo();
-			Variables =
-				new IoMappingParser().Parse(xmlMappingInfo) as Dictionary<string, List<Variable>>;
+			ThreadHelper.ThrowIfNotOnUIThread();
 
-			TreeData = new ObservableCollection<TreeNode>(BuildTree(Variables));
-			FilteredTreeData = new ObservableCollection<TreeNode>(TreeData);
-
-			SearchQuery = string.Empty;
-		}
-
-		private void OnTreeItemSelected(TreeNode node)
-		{
-			if (node != null)
+			try
 			{
-				Console.WriteLine($"Selected: {node.Name}");
+				string xmlMappingInfo = _systemManager?.ProduceMappingInfo();
+
+				Variables = new IoMappingParser().Parse(xmlMappingInfo);
+				TreeData = BuildTree(Variables);
+
+				// ApplyFilter is called explicitly instead of relying on the SearchQuery setter.
+				// The setter only raises a change notification when the value actually changes,
+				// so a reload with an unchanged filter would otherwise keep showing stale data.
+				ApplyFilter();
+
+				int links = Variables.Sum(entry => entry.Value?.Count ?? 0);
+				Status = $"{links} link(s) in {Variables.Count} mapping(s).";
+			}
+			catch (Exception ex)
+			{
+				TreeData = new ObservableCollection<TreeNode>();
+				FilteredTreeData = new ObservableCollection<TreeNode>();
+				Status = "The mapping information could not be read.";
+
+				ThreadHelper
+					.JoinableTaskFactory.RunAsync(
+						() => Report.FailureAsync("Failed to read the I/O mapping.", ex)
+					)
+					.FireAndForget();
 			}
 		}
 
-		private void OnTreeItemDoubleClicked(TreeNode node)
+		/// <summary>
+		/// Copies the selected entry, or the whole tree when nothing is selected, to the
+		/// clipboard.
+		/// </summary>
+		private void Copy(TreeNode node)
 		{
-			if (node != null)
+			string text =
+				node == null ? IoMappingCsv.Build(Variables) : Flatten(node, string.Empty);
+
+			try
 			{
-				Console.WriteLine($"Double-clicked: {node.Name}");
+				Clipboard.SetText(text);
+				Status = "Copied to the clipboard.";
+			}
+			catch (Exception)
+			{
+				// Another process may hold the clipboard open. Losing a copy is not worth an
+				// error dialog.
+				Status = "The clipboard is not available.";
 			}
 		}
 
-		private void GoToDestination()
+		private void Export()
 		{
-			Console.WriteLine("Go To Destination executed");
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			try
+			{
+				var dialog = new Microsoft.Win32.SaveFileDialog
+				{
+					Title = "Export I/O mappings",
+					Filter = "CSV file (*.csv)|*.csv",
+					DefaultExt = ".csv",
+					FileName = "IoMappings.csv"
+				};
+
+				if (dialog.ShowDialog() != true)
+				{
+					return;
+				}
+
+				File.WriteAllText(dialog.FileName, IoMappingCsv.Build(Variables));
+
+				Status = $"Exported to {dialog.FileName}.";
+			}
+			catch (Exception ex)
+			{
+				Status = "The export failed.";
+
+				ThreadHelper
+					.JoinableTaskFactory.RunAsync(
+						() => Report.FailureAsync("Failed to export the I/O mapping.", ex)
+					)
+					.FireAndForget();
+			}
 		}
 
-		private void GoToSource()
+		private static string Flatten(TreeNode node, string prefix)
 		{
-			Console.WriteLine("Go To Source executed");
+			if (node == null)
+			{
+				return string.Empty;
+			}
+
+			string line = string.IsNullOrEmpty(prefix) ? node.Name : $"{prefix} / {node.Name}";
+
+			if (node.Children.Count == 0)
+			{
+				return line;
+			}
+
+			return string.Join(
+				Environment.NewLine,
+				node.Children.Select(child => Flatten(child, line))
+			);
 		}
 
-		public Task InitializeAsync(ITcSysManager2 systemManager)
+		public async Task InitializeAsync(ITcSysManager2 systemManager)
 		{
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
 			_systemManager = systemManager as ITcSysManager3;
 
 			Reload();
-
-			return Task.CompletedTask;
 		}
 
 		private void ApplyFilter()
@@ -129,23 +217,22 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 			if (string.IsNullOrEmpty(SearchQuery))
 			{
 				FilteredTreeData = new ObservableCollection<TreeNode>(TreeData);
-			}
-			else
-			{
-				var filtered = TreeData
-					.Select(node => FilterNode(node, SearchQuery))
-					.Where(node => node != null)
-					.ToList();
-
-				FilteredTreeData = new ObservableCollection<TreeNode>(filtered);
+				return;
 			}
 
-			OnPropertyChanged(nameof(FilteredTreeData));
+			FilteredTreeData = new ObservableCollection<TreeNode>(
+				TreeData.Select(node => FilterNode(node, SearchQuery)).Where(node => node != null)
+			);
 		}
 
 		private TreeNode FilterNode(TreeNode node, string query)
 		{
-			if (node.Name.Contains(query))
+			if (node == null)
+			{
+				return null;
+			}
+
+			if (node.Name?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
 			{
 				return node;
 			}
@@ -154,37 +241,40 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 				.Where(child => child != null)
 				.ToList();
 
-			if (filteredChildren.Any())
-			{
-				return new TreeNode
+			return filteredChildren.Any()
+				? new TreeNode
 				{
 					Name = node.Name,
 					Children = new ObservableCollection<TreeNode>(filteredChildren)
-				};
-			}
-
-			return null;
+				}
+				: null;
 		}
 
-		public static Dictionary<string, List<Variable>> ExtractVariables(string mappings) =>
-			(Dictionary<string, List<Variable>>)new IoMappingParser().Parse(mappings);
+		public static IDictionary<string, List<Variable>> ExtractVariables(string mappings) =>
+			new IoMappingParser().Parse(mappings);
 
-		private ObservableCollection<TreeNode> BuildTree(
-			Dictionary<string, List<Variable>> dictionary
+		internal static ObservableCollection<TreeNode> BuildTree(
+			IDictionary<string, List<Variable>> dictionary
 		)
 		{
 			var rootNodes = new ObservableCollection<TreeNode>();
 
+			if (dictionary == null)
+			{
+				return rootNodes;
+			}
+
 			foreach (var kvp in dictionary)
 			{
-				string[] keyParts = kvp.Key.Split('^');
-				AddToTree(rootNodes, keyParts, 0, kvp.Value);
+				string[] keyParts = (kvp.Key ?? string.Empty).Split('^');
+
+				AddToTree(rootNodes, keyParts, 0, kvp.Value ?? new List<Variable>());
 			}
 
 			return rootNodes;
 		}
 
-		private void AddToTree(
+		private static void AddToTree(
 			ObservableCollection<TreeNode> nodes,
 			string[] pathParts,
 			int index,
@@ -192,10 +282,14 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 		)
 		{
 			if (index >= pathParts.Length)
+			{
 				return;
+			}
 
-			var currentPart = pathParts[index];
-			var existingNode = FindNode(nodes, currentPart);
+			string currentPart = pathParts[index];
+			TreeNode existingNode = nodes.FirstOrDefault(
+				node => string.Equals(node.Name, currentPart, StringComparison.Ordinal)
+			);
 
 			if (existingNode == null)
 			{
@@ -205,32 +299,21 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 
 			if (index == pathParts.Length - 1)
 			{
-				foreach (var variable in variables)
+				foreach (Variable variable in variables.Where(variable => variable != null))
 				{
 					existingNode.Children.Add(
 						new TreeNode
 						{
 							Name =
-								$"Name: {variable.Name}, Path: {variable.Path}, Size: {variable.Size}, Offset: {variable.Offset}"
+								$"{variable.Name} | {variable.Path} | size {variable.Size} | offset {variable.Offset}"
 						}
 					);
 				}
-			}
-			else
-			{
-				AddToTree(existingNode.Children, pathParts, index + 1, variables);
-			}
-		}
 
-		private TreeNode FindNode(ObservableCollection<TreeNode> nodes, string name)
-		{
-			foreach (var node in nodes)
-			{
-				if (node.Name == name)
-					return node;
+				return;
 			}
 
-			return null;
+			AddToTree(existingNode.Children, pathParts, index + 1, variables);
 		}
 	}
 }

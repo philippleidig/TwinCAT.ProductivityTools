@@ -1,4 +1,6 @@
-﻿using System.Windows;
+using System.Windows;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using TwinCAT.Ads;
 
 namespace TwinCAT.ProductivityTools
@@ -20,9 +22,27 @@ namespace TwinCAT.ProductivityTools
 			Loaded += OnLoaded;
 		}
 
-		private async void OnLoaded(object sender, RoutedEventArgs e)
+		// A dialog must not be opened with "async void". An exception from the load would
+		// otherwise be raised on the message pump and take the whole IDE down instead of the
+		// dialog.
+		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
-			await viewModel.InitializeAsync();
+			Microsoft
+				.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+				{
+					try
+					{
+						await viewModel.InitializeAsync();
+					}
+					catch (System.Exception ex)
+					{
+						await TwinCAT.ProductivityTools.Helpers.Report.FailureAsync(
+							"Failed to read the target information.",
+							ex
+						);
+					}
+				})
+				.FireAndForget();
 		}
 
 		private TcRteInstallViewModel viewModel;

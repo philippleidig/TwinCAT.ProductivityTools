@@ -1,75 +1,65 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using TCatSysManagerLib;
 using TwinCAT.Ads;
-using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Helpers;
+using TwinCAT.ProductivityTools.Installation;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
+	/// <summary>
+	/// Runs <c>win8settick.bat</c> on the target, which sets the Windows timer resolution to 1 ms
+	/// and is a prerequisite for a stable real time behaviour on many IPCs.
+	/// </summary>
 	[Command(PackageIds.SetTickCommandId)]
-	internal sealed class SetTickCommand : BaseCommand<SetTickCommand>
+	internal sealed class SetTickCommand : TargetCommandBase<SetTickCommand>
 	{
-		protected override void BeforeQueryStatus(EventArgs e)
+		protected override string OperationName => "Windows set tick";
+
+		protected override string ConfirmationFor(string targetName) =>
+			$"Run {TargetPaths.SetTickScriptName} on the target <{targetName}>?";
+
+		protected override async Task ExecuteAsync(AmsNetId target, string targetName)
 		{
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = true;
+			// The script lives in a different directory on 4024 and on 4026, and the target is a
+			// remote machine whose file system cannot be probed. Its TwinCAT version decides.
+			Version version = await ReadTwinCatVersionAsync(target);
+
+			string script = TargetPaths.SetTickScript(version);
+
+			await RemoteControl.StartProcessAsync(
+				target,
+				script,
+				Path.GetDirectoryName(script),
+				string.Empty,
+				CancellationToken.None
+			);
+
+			await Report.ShowStatusAsync(
+				$"{TargetPaths.SetTickScriptName} started on target <{targetName}>."
+			);
 		}
 
-		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
+		private static async System.Threading.Tasks.Task<Version> ReadTwinCatVersionAsync(
+			AmsNetId target
+		)
 		{
-			ITcSysManager2 systemManager =
-				await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
-
-			if (systemManager is null)
-			{
-				await VS.MessageBox.ShowAsync(
-					"TwinCAT ProductivityTools",
-					"Solution does not contain a TwinCAT XAE project!"
-				);
-				return;
-			}
-
-			var target = systemManager.GetTargetNetId();
-			AmsNetId.TryParse(target, out AmsNetId amsnetid);
-
-			if (
-				!await VS.MessageBox.ShowConfirmAsync(
-					"Execute win8settick.bat on target <" + target + "> ?",
-					"win8settick.bat"
-				)
-			)
-				return;
-
 			try
 			{
-				var path = @"C:\TwinCAT\3.1\System\win8settick.bat";
-				var dir = @"C:\TwinCAT\3.1\System";
-
-				await RemoteControl.StartProcessAsync(
-					new Ads.AmsNetId(target),
-					path,
-					dir,
-					string.Empty,
+				DeviceInfo deviceInfo = await RemoteControl.GetDeviceInfoAsync(
+					target,
 					CancellationToken.None
 				);
 
-				await VS.StatusBar.ShowMessageAsync(
-					"win8settick.bat successfully executed on target <" + target + ">"
-				);
+				return deviceInfo?.TwinCATVersion;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				await VS.MessageBox.ShowErrorAsync(
-					"Execution of win8settick.bat on target <" + target + "> failed!",
-					ex.Message
-				);
+				// An unreachable device info service must not stop the command. The caller falls
+				// back to the 4024 layout, which is still the most common one.
+				return null;
 			}
 		}
 	}

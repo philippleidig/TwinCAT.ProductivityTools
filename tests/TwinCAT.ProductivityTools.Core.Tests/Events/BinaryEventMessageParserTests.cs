@@ -35,7 +35,10 @@ namespace TwinCAT.ProductivityTools.Tests.Events
 		[InlineData(EventSeverity.LOG)]
 		public void Maps_the_severity_flags(EventSeverity severity)
 		{
-			parser.Parse(Notification(DateTime.Now, severity, 1, "S", "m")).Severity.Should().Be(severity);
+			parser
+				.Parse(Notification(DateTime.Now, severity, 1, "S", "m"))
+				.Severity.Should()
+				.Be(severity);
 		}
 
 		[Fact]

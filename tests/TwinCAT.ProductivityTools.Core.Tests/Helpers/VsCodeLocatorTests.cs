@@ -14,8 +14,7 @@ namespace TwinCAT.ProductivityTools.Tests.Helpers
 		private const string UserInstallation =
 			@"C:\Users\tester\AppData\Local\Programs\Microsoft VS Code\Code.exe";
 
-		private const string MachineInstallation =
-			@"C:\Program Files\Microsoft VS Code\Code.exe";
+		private const string MachineInstallation = @"C:\Program Files\Microsoft VS Code\Code.exe";
 
 		[Fact]
 		public void Finds_the_editor_through_the_shell_integration_key()

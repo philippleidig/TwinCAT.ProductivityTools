@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Imaging;
@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Abstractions;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Helpers;
 
 namespace TwinCAT.ProductivityTools.InfoBars
 {
@@ -43,36 +44,36 @@ namespace TwinCAT.ProductivityTools.InfoBars
 
 		protected override void OnActionItemClicked(object sender, InfoBarActionItemEventArgs args)
 		{
-			ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-			{
-				await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-				try
+			ThreadHelper
+				.JoinableTaskFactory.RunAsync(async () =>
 				{
-					ITcSysManager2 systemManager =
-						await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
-					systemManager.EnableUseRelativeNetIds();
+					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-					await VS.Solutions.SaveAsync();
+					try
+					{
+						ITcSysManager2 systemManager =
+							await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
 
-					await VS.StatusBar.ShowMessageAsync("Successfully enabled relative AmsNetIDs.");
-				}
-				catch (Exception ex)
-				{
-					await VS.StatusBar.ShowMessageAsync(
-						"Failed to enable relative AmsNetIds. See output window for detailed information."
-					);
+						if (systemManager == null)
+						{
+							return;
+						}
 
-					IOutputWindowPane outputWindowPane = await VS.GetRequiredServiceAsync<
-						IOutputWindowPane,
-						IOutputWindowPane
-					>();
-					await outputWindowPane.WriteLineAsync(ex.Message);
-				}
-			});
+						systemManager.EnableUseRelativeNetIds();
+
+						await VS.Solutions.SaveAsync();
+
+						await Report.ShowStatusAsync("Relative AmsNetIDs are now enabled.");
+					}
+					catch (Exception ex)
+					{
+						await Report.FailureAsync("Failed to enable relative AmsNetIDs.", ex);
+					}
+				})
+				.FireAndForget();
 
 			ThreadHelper.ThrowIfNotOnUIThread();
-			args.InfoBarUIElement.Close();
+			args.InfoBarUIElement?.Close();
 		}
 	}
 }

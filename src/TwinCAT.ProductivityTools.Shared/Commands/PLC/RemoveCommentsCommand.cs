@@ -1,85 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
 using Community.VisualStudio.Toolkit;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Abstractions;
-using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.Plc;
-using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
 	[Command(PackageIds.RemoveCommentsCommandId)]
-	internal class RemoveCommentsCommand : BaseCommand<RemoveCommentsCommand>
+	internal sealed class RemoveCommentsCommand : PlcTextRewriteCommandBase<RemoveCommentsCommand>
 	{
 		private readonly ICommentRemover commentRemover = new CommentRemover();
 
-		protected override void BeforeQueryStatus(EventArgs e)
-		{
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = true;
-		}
+		protected override string OperationName => "Remove all comments";
 
-		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
-		{
-			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-			EnvDTE.ProjectItem selectedItem = dte.GetSelectedProjectItem();
-
-			if (selectedItem == null || !(selectedItem.Object is ITcPlcPou plcPou))
-				return;
-
-			try
-			{
-				dte.UndoContext.Open("Remove Comments");
-
-				RemoveComments(
-					plcPou as ITcPlcImplementation,
-					text => (plcPou as ITcPlcImplementation).ImplementationText = text
-				);
-				RemoveComments(
-					plcPou as ITcPlcDeclaration,
-					text => (plcPou as ITcPlcDeclaration).DeclarationText = text
-				);
-
-				selectedItem.Save();
-			}
-			catch (Exception ex)
-			{
-				await VS.StatusBar.ShowMessageAsync(
-					$"Failed to remove comments in {selectedItem.Name}. See output window for more information."
-				);
-
-				IOutputWindowPane outputWindowPane = await VS.GetRequiredServiceAsync<
-					IOutputWindowPane,
-					IOutputWindowPane
-				>();
-				await outputWindowPane.WriteLineAsync(ex.Message);
-			}
-			finally
-			{
-				dte.UndoContext.Close();
-			}
-		}
-
-		private void RemoveComments<T>(T plcPart, Action<string> updateTextAction)
-			where T : class
-		{
-			if (plcPart == null)
-				return;
-
-			string text =
-				typeof(T) == typeof(ITcPlcImplementation)
-					? (plcPart as ITcPlcImplementation)?.ImplementationText
-					: (plcPart as ITcPlcDeclaration)?.DeclarationText;
-
-			if (string.IsNullOrEmpty(text))
-				return;
-
-			updateTextAction(commentRemover.Remove(text));
-		}
+		protected override string Rewrite(string text) => commentRemover.Remove(text);
 	}
 }

@@ -73,7 +73,10 @@ namespace TwinCAT.ProductivityTools.Tests.Helpers
 		[Fact]
 		public void Understands_a_double_asterisk_as_any_number_of_directories()
 		{
-			Filter("_Libraries/**/*.library").Denies("_Libraries/system/tc2/x.library").Should().BeTrue();
+			Filter("_Libraries/**/*.library")
+				.Denies("_Libraries/system/tc2/x.library")
+				.Should()
+				.BeTrue();
 		}
 
 		[Fact]

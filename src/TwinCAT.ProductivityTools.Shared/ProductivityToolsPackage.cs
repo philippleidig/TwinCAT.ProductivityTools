@@ -32,9 +32,25 @@ namespace TwinCAT.ProductivityTools
 		Window = EnvDTE.Constants.vsWindowKindMainWindow,
 		Style = VsDockStyle.Tabbed
 	)]
-	[ProvideService((typeof(ITargetSystemService)), IsAsyncQueryable = true)]
 	[ProvideService((typeof(IOutputWindowPane)), IsAsyncQueryable = true)]
-	[ProvideService((typeof(ITwinCATEventListenerService)), IsAsyncQueryable = true)]
+	[ProvideOptionPage(
+		typeof(Options.OptionsProvider.GeneralOptions),
+		Vsix.Name,
+		"General",
+		0,
+		0,
+		true,
+		SupportsProfiles = true
+	)]
+	[ProvideOptionPage(
+		typeof(Options.OptionsProvider.BuildOptions),
+		Vsix.Name,
+		"Build",
+		0,
+		0,
+		true,
+		SupportsProfiles = true
+	)]
 	public sealed class ProductivityToolsPackage : ToolkitPackage
 	{
 		protected override async Task InitializeAsync(
@@ -49,10 +65,11 @@ namespace TwinCAT.ProductivityTools
 			await this.RegisterServicesAsync();
 			await this.RegisterCommandsAsync();
 
-			// An info bar only makes a recommendation. A failure while evaluating it must never
-			// abort package initialization, because a failed SetSite disables every command of
-			// this package for the whole IDE session.
+			// Neither an info bar nor the artefact cleanup is essential. A failure while setting
+			// them up must never abort package initialization, because a failed SetSite disables
+			// every command of this package for the whole IDE session.
 			await this.SafelyAsync(this.RegisterInfoBarsAsync);
+			await this.SafelyAsync(BuildArtifactCleanupService.Instance.ApplyOptionsAsync);
 		}
 
 		private async Task SafelyAsync(Func<Task> action)
@@ -74,19 +91,11 @@ namespace TwinCAT.ProductivityTools
 			ActivityLog.TryLogError(nameof(ProductivityToolsPackage), exception.ToString());
 		}
 
-		private async Task RegisterServicesAsync()
+		private Task RegisterServicesAsync()
 		{
-			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<EnvDTE.DTE, EnvDTE.DTE>();
-
 			this.AddService<OutputWindow, IOutputWindowPane>(new OutputWindow());
 
-			this.AddService<TargetSystemService, ITargetSystemService>(
-				new TargetSystemService(dte)
-			);
-
-			this.AddService<TwinCATEventListenerService, ITwinCATEventListenerService>(
-				new TwinCATEventListenerService()
-			);
+			return Task.CompletedTask;
 		}
 
 		private async Task RegisterInfoBarsAsync()

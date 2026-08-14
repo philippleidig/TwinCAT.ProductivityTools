@@ -1,85 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
 using Community.VisualStudio.Toolkit;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Abstractions;
-using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.Plc;
-using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Commands
 {
 	[Command(PackageIds.RemoveRegionsCommandId)]
-	internal class RemoveRegionsCommand : BaseCommand<RemoveRegionsCommand>
+	internal sealed class RemoveRegionsCommand : PlcTextRewriteCommandBase<RemoveRegionsCommand>
 	{
 		private readonly IRegionRemover regionRemover = new RegionRemover();
 
-		protected override void BeforeQueryStatus(EventArgs e)
-		{
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded();
-			Command.Enabled = true;
-		}
+		protected override string OperationName => "Remove all regions";
 
-		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
-		{
-			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-			var dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-			var selectedItem = dte.GetSelectedProjectItem();
-
-			if (!(selectedItem?.Object is ITcPlcPou plcPou))
-				return;
-
-			try
-			{
-				dte.UndoContext.Open("Remove Regions");
-
-				RemoveRegions(
-					plcPou as ITcPlcImplementation,
-					text => ((ITcPlcImplementation)plcPou).ImplementationText = text
-				);
-				RemoveRegions(
-					plcPou as ITcPlcDeclaration,
-					text => ((ITcPlcDeclaration)plcPou).DeclarationText = text
-				);
-
-				selectedItem.Save();
-			}
-			catch (Exception ex)
-			{
-				await VS.StatusBar.ShowMessageAsync(
-					$"Failed to remove regions in {selectedItem.Name}. See output window for more information."
-				);
-
-				IOutputWindowPane outputWindowPane = await VS.GetRequiredServiceAsync<
-					IOutputWindowPane,
-					IOutputWindowPane
-				>();
-				await outputWindowPane.WriteLineAsync(ex.Message);
-			}
-			finally
-			{
-				dte.UndoContext.Close();
-			}
-		}
-
-		private void RemoveRegions<T>(T plcPart, Action<string> updateTextAction)
-			where T : class
-		{
-			if (plcPart == null)
-				return;
-
-			string text =
-				typeof(T) == typeof(ITcPlcImplementation)
-					? (plcPart as ITcPlcImplementation)?.ImplementationText
-					: (plcPart as ITcPlcDeclaration)?.DeclarationText;
-
-			if (string.IsNullOrEmpty(text))
-				return;
-
-			updateTextAction(regionRemover.Remove(text));
-		}
+		protected override string Rewrite(string text) => regionRemover.Remove(text);
 	}
 }

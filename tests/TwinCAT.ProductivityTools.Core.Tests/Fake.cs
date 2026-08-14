@@ -29,10 +29,7 @@ namespace TwinCAT.ProductivityTools.Tests
 			return probe;
 		}
 
-		public static IRegistryProvider Registry(
-			string twinCatDirectory = null,
-			int? build = null
-		)
+		public static IRegistryProvider Registry(string twinCatDirectory = null, int? build = null)
 		{
 			var registry = Substitute.For<IRegistryProvider>();
 
@@ -91,9 +88,10 @@ namespace TwinCAT.ProductivityTools.Tests
 			string prefix = parent.TrimEnd('\\') + "\\";
 
 			return directories
-				.Where(directory =>
-					directory.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase)
-					&& !directory.Substring(prefix.Length).Contains("\\")
+				.Where(
+					directory =>
+						directory.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase)
+						&& !directory.Substring(prefix.Length).Contains("\\")
 				)
 				.ToArray();
 		}

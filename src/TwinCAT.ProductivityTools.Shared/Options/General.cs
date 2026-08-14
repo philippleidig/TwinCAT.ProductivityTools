@@ -1,14 +1,25 @@
-﻿using System;
+using System;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using Community.VisualStudio.Toolkit;
+using Microsoft.VisualStudio.Shell;
 
 namespace TwinCAT.ProductivityTools.Options
 {
+	internal partial class OptionsProvider
+	{
+		[ComVisible(true)]
+		public class GeneralOptions : BaseOptionPage<General> { }
+	}
+
 	public class General : BaseOptionModel<General>
 	{
-		[Category("General")]
+		[Category("External tools")]
 		[DisplayName("Path to code.exe")]
-		[Description("Specify the path to code.exe.")]
+		[Description(
+			"Full path of the Visual Studio Code executable that is used by \"Open in VS Code\". "
+				+ "Leave empty to detect the installation automatically."
+		)]
 		public string VsCodeInstallPath { get; set; } =
 			Environment.ExpandEnvironmentVariables(
 				@"%localappdata%\Programs\Microsoft VS Code\Code.exe"

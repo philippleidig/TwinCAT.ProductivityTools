@@ -23,7 +23,9 @@ namespace TwinCAT.ProductivityTools.Tests.Installation
 		public void Accepts_the_spellings_the_system_manager_produces(string value)
 		{
 			RoutingXml
-				.IsUseRelativeNetIdsEnabled($"<TreeItem><UseRelativeNetIds>{value}</UseRelativeNetIds></TreeItem>")
+				.IsUseRelativeNetIdsEnabled(
+					$"<TreeItem><UseRelativeNetIds>{value}</UseRelativeNetIds></TreeItem>"
+				)
 				.Should()
 				.BeTrue();
 		}
@@ -40,7 +42,10 @@ namespace TwinCAT.ProductivityTools.Tests.Installation
 		[Fact]
 		public void Treats_a_missing_setting_as_disabled()
 		{
-			RoutingXml.IsUseRelativeNetIdsEnabled("<TreeItem><RoutePrj /></TreeItem>").Should().BeFalse();
+			RoutingXml
+				.IsUseRelativeNetIdsEnabled("<TreeItem><RoutePrj /></TreeItem>")
+				.Should()
+				.BeFalse();
 		}
 
 		[Theory]

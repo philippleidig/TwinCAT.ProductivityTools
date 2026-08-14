@@ -51,5 +51,26 @@ namespace TwinCAT.ProductivityTools.Extensions
 				return null;
 			}
 		}
+
+		/// <summary>
+		/// Returns the path of the item on disk, or <c>null</c> when it has none.
+		/// </summary>
+		/// <remarks>
+		/// Not every TwinCAT tree item is backed by a file, and asking an item that is not for its
+		/// <c>FullPath</c> property throws instead of returning an empty value.
+		/// </remarks>
+		public static string GetFullPath(this ProjectItem projectItem)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			try
+			{
+				return projectItem?.Properties?.Item("FullPath")?.Value?.ToString();
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
 	}
 }

@@ -43,6 +43,7 @@
 
       <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0000" />
       <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" priority="0x0000" />
+      <Group guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" priority="0x0000" />
 
       <Group guid="ProductivityToolsCmdSet" id="TwinCATIODeviceContextMenuGroup" priority="0x0000" />
       <Group guid="ProductivityToolsCmdSet" id="TwinCATIOMappingContextMenuGroup" priority="0x0000" />
@@ -180,6 +181,16 @@
             </Strings>
         </Button>
 
+        <!-- TwinCAT XAE - Context Menu - Delete build artifacts on clean -->
+        <Button guid="ProductivityToolsCmdSet" id="DeleteBuildArtifactsOnCleanCommandId" priority="0x0000" type="Button">
+            <CommandFlag>DefaultDisabled</CommandFlag>
+            <CommandFlag>DefaultInvisible</CommandFlag>
+            <CommandFlag>DynamicVisibility</CommandFlag>
+            <Strings>
+                <ButtonText>Delete build artifacts on clean</ButtonText>
+            </Strings>
+        </Button>
+
         <!-- TwinCAT IO Device - Context Menu - Enable ADS Server -->
         <Button guid="ProductivityToolsCmdSet" id="EnableAdsServerCommandId" priority="0x0000" type="Button">
             <Strings>
@@ -280,6 +291,10 @@
             <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
         </CommandPlacement>
 
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="DeleteBuildArtifactsOnCleanCommandId" priority="0x0000">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATXaeProjectContextMenuGroup" />
+        </CommandPlacement>
+
        
         <!-- TwinCAT PLC Project File - Context Menu-->
         <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcFileContextMenuGroup" priority="0x0010">
@@ -306,6 +321,29 @@
         <CommandPlacement guid="ProductivityToolsCmdSet" id="OpenInVsCodeCommandId" priority="0x0110">
             <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
         </CommandPlacement>
+
+        <!-- The text commands work on every item below the selection, so they are offered on a
+             folder and on the PLC project itself as well, not just on a single object. -->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0120">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0130">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcFolderContextMenuGroup" />
+        </CommandPlacement>
+
+        <!-- TwinCAT PLC Project - Context Menu-->
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" priority="0x0110">
+            <Parent guid="TwinCATPlcProjectCmdSet" id="TwinCATPlcProjectContextMenuId" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveCommentsCommandId" priority="0x0120">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" />
+        </CommandPlacement>
+
+        <CommandPlacement guid="ProductivityToolsCmdSet" id="RemoveRegionsCommandId" priority="0x0130">
+            <Parent guid="ProductivityToolsCmdSet" id="TwinCATPlcProjectContextMenuGroup" />
+        </CommandPlacement>
     </CommandPlacements>    
     
   <Symbols>
@@ -315,6 +353,7 @@
         <IDSymbol name="TwinCATProductivityTools" value="0x1020" />
         <IDSymbol name="TwinCATPlcFileContextMenuGroup" value="0x1250" />
         <IDSymbol name="TwinCATPlcFolderContextMenuGroup" value="0x2250" />
+        <IDSymbol name="TwinCATPlcProjectContextMenuGroup" value="0x2260" />
         <IDSymbol name="TwinCATXaeProjectContextMenuGroup" value="0x2350" />
         <IDSymbol name="TwinCATIODeviceContextMenuGroup" value="0x3250" />
         <IDSymbol name="TwinCATIOMappingContextMenuGroup" value="0x4250" />
@@ -343,6 +382,7 @@
         <IDSymbol name="FreezeProjectCommandId" value="0x0321"/>
         <IDSymbol name="OpenLoggedEventsCommandId" value="0x0322"/>
         <IDSymbol name="UseRelativeNetIdsCommandId" value="0x0323"/>
+        <IDSymbol name="DeleteBuildArtifactsOnCleanCommandId" value="0x0324"/>
         
         
         <IDSymbol name="ShowMappingToolWindowCommandId" value="0x0522"/>

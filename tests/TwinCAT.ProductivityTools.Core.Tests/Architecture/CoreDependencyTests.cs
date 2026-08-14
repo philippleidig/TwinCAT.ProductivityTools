@@ -29,14 +29,17 @@ namespace TwinCAT.ProductivityTools.Tests.Architecture
 		[Fact]
 		public void The_core_library_does_not_reference_the_visual_studio_shell()
 		{
-			IEnumerable<string> referenced = Core.GetReferencedAssemblies().Select(name => name.Name);
+			IEnumerable<string> referenced = Core.GetReferencedAssemblies()
+				.Select(name => name.Name);
 
 			referenced
 				.Should()
-				.NotContain(name =>
-					ForbiddenAssemblies.Any(forbidden =>
-						name.StartsWith(forbidden, StringComparison.OrdinalIgnoreCase)
-					)
+				.NotContain(
+					name =>
+						ForbiddenAssemblies.Any(
+							forbidden =>
+								name.StartsWith(forbidden, StringComparison.OrdinalIgnoreCase)
+						)
 				);
 		}
 

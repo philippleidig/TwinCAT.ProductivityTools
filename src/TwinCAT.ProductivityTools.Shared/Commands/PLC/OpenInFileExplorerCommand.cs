@@ -1,27 +1,39 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.IO;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Helpers;
 using Task = System.Threading.Tasks.Task;
 
-namespace TwinCAT.ProductivityTools.Commands.PLC
+namespace TwinCAT.ProductivityTools.Commands
 {
+	/// <summary>
+	/// Opens the directory of the selected PLC folder in the Windows file explorer.
+	/// </summary>
 	[Command(PackageIds.OpenInFileExplorerCommandId)]
-	internal class OpenInFileExplorerCommand : BaseCommand<OpenInFileExplorerCommand>
+	internal sealed class OpenInFileExplorerCommand : BaseCommand<OpenInFileExplorerCommand>
 	{
 		protected override void BeforeQueryStatus(EventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			var dte = VS.GetRequiredService<DTE, DTE>();
-			ITcSmTreeItem treeItem = dte.GetSelectedObject<ITcSmTreeItem>();
+			bool isPlcProjectFolder = false;
 
-			bool isPlcProjectFolder = treeItem != null && treeItem.IsPlcProjectFolder();
+			try
+			{
+				DTE dte = VS.GetRequiredService<DTE, DTE>();
+				isPlcProjectFolder = dte.GetSelectedObject<ITcSmTreeItem>().IsPlcProjectFolder();
+			}
+			catch (Exception)
+			{
+				// An unreadable selection hides the command instead of breaking the context menu.
+			}
 
-			Command.Visible = VS.Solutions.IsTwinCATProjectLoaded() && isPlcProjectFolder;
+			Command.Visible = isPlcProjectFolder;
 			Command.Enabled = isPlcProjectFolder;
 		}
 
@@ -29,17 +41,29 @@ namespace TwinCAT.ProductivityTools.Commands.PLC
 		{
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			var dte = VS.GetRequiredService<DTE, DTE>();
-			ProjectItem selectedItem = dte.GetSelectedProjectItem();
+			DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
 
-			string filePath = selectedItem?.Properties?.Item("FullPath")?.Value?.ToString();
+			string path = dte.GetSelectedProjectItem().GetFullPath();
 
-			if (string.IsNullOrEmpty(filePath) || !Directory.Exists(filePath))
+			if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
 			{
+				await VS.MessageBox.ShowErrorAsync(
+					Vsix.Name,
+					"The selected item does not have a directory on disk."
+				);
 				return;
 			}
 
-			System.Diagnostics.Process.Start("explorer.exe", filePath);
+			try
+			{
+				// The path is quoted because the explorer would otherwise treat a space as a
+				// separator between two arguments.
+				using (System.Diagnostics.Process.Start("explorer.exe", $"\"{path}\"")) { }
+			}
+			catch (Exception ex)
+			{
+				await Report.FailureAsync("Failed to open the file explorer.", ex);
+			}
 		}
 	}
 }

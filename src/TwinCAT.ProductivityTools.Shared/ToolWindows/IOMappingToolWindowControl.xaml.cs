@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
-using Newtonsoft.Json.Linq;
 using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Extensions;
+using TwinCAT.ProductivityTools.Helpers;
 
 namespace TwinCAT.ProductivityTools.ToolWindows
 {
@@ -16,6 +16,7 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 		public IOMappingToolWindowControl()
 		{
 			InitializeComponent();
+
 			ViewModel = new IOMappingViewModel();
 			DataContext = ViewModel;
 
@@ -24,24 +25,27 @@ namespace TwinCAT.ProductivityTools.ToolWindows
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
-			ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-			{
-				await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+			ThreadHelper
+				.JoinableTaskFactory.RunAsync(async () =>
+				{
+					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-				try
-				{
-					ITcSysManager2 systemManager =
-						await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
-					await ViewModel.InitializeAsync(systemManager);
-				}
-				catch (Exception ex)
-				{
-					VS.MessageBox.ShowError(
-						Vsix.Name,
-						"Failed to open TwinCAT IO tool window. \n" + ex.Message
-					);
-				}
-			});
+					try
+					{
+						ITcSysManager2 systemManager =
+							await VS.Solutions.GetActiveTwinCATProjectSystemManagerAsync();
+
+						await ViewModel.InitializeAsync(systemManager);
+					}
+					catch (Exception ex)
+					{
+						// The tool window can be reopened from the last IDE session before a
+						// solution is loaded. Reporting to the output window keeps that case from
+						// greeting the user with a modal dialog on every start.
+						await Report.FailureAsync("Failed to read the I/O mapping.", ex);
+					}
+				})
+				.FireAndForget();
 		}
 	}
 }

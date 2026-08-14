@@ -69,19 +69,28 @@ namespace TwinCAT.ProductivityTools.Tests.Common
 		[Fact]
 		public void Copies_a_slice()
 		{
-			new byte[] { 1, 2, 3, 4, 5 }.CopySlice(1, 3).Should().Equal(2, 3, 4);
+			new byte[] { 1, 2, 3, 4, 5 }
+				.CopySlice(1, 3)
+				.Should()
+				.Equal(2, 3, 4);
 		}
 
 		[Fact]
 		public void Shortens_a_slice_that_reaches_beyond_the_source()
 		{
-			new byte[] { 1, 2, 3 }.CopySlice(2, 3).Should().Equal(3);
+			new byte[] { 1, 2, 3 }
+				.CopySlice(2, 3)
+				.Should()
+				.Equal(3);
 		}
 
 		[Fact]
 		public void Pads_a_slice_that_reaches_beyond_the_source_when_asked_to()
 		{
-			new byte[] { 1, 2, 3 }.CopySlice(2, 3, padToLength: true).Should().Equal(3, 0, 0);
+			new byte[] { 1, 2, 3 }
+				.CopySlice(2, 3, padToLength: true)
+				.Should()
+				.Equal(3, 0, 0);
 		}
 
 		[Fact]
@@ -131,8 +140,14 @@ namespace TwinCAT.ProductivityTools.Tests.Common
 		[Fact]
 		public void Detects_a_list_of_only_empty_values()
 		{
-			new List<string> { null, null }.AreValuesEmpty().Should().BeTrue();
-			new List<string> { null, "a" }.AreValuesEmpty().Should().BeFalse();
+			new List<string> { null, null }
+				.AreValuesEmpty()
+				.Should()
+				.BeTrue();
+			new List<string> { null, "a" }
+				.AreValuesEmpty()
+				.Should()
+				.BeFalse();
 		}
 
 		[Fact]

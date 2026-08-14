@@ -37,6 +37,8 @@ namespace TwinCAT.ProductivityTools.Services
 
 		public async Task FreezeProjectAsync(EnvDTE.Project project)
 		{
+			await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
 			if (!(project?.Object is ITcSysManager2 systemManager))
 			{
 				return;

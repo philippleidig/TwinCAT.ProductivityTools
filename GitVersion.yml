@@ -1,0 +1,44 @@
+# GitVersion configuration (schema of GitVersion 5.x, which the workflows pin).
+#
+# The released version is derived from the commit history instead of a file that has to be edited
+# by hand. Every push to main produces a release, and the size of the bump follows the conventional
+# commit prefix that the commits since the last tag carry:
+#
+#   feat!: / BREAKING CHANGE:  -> major
+#   feat:                      -> minor
+#   fix:, perf:, chore:, ...   -> patch
+#
+# Mainline mode is used because the repository releases straight from main and every merge into it
+# is meant to be shippable.
+mode: Mainline
+
+major-version-bump-message: '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([\w\s-]*\))?!:'
+minor-version-bump-message: '^(feat)(\([\w\s-]*\))?:'
+patch-version-bump-message: '^(build|chore|ci|docs|fix|perf|refactor|revert|style|test)(\([\w\s-]*\))?:'
+no-bump-message: '^(none|skip)(\([\w\s-]*\))?:'
+
+commit-message-incrementing: Enabled
+continuous-delivery-fallback-tag: ''
+
+branches:
+  main:
+    regex: ^master$|^main$
+    mode: ContinuousDeployment
+    tag: ''
+    increment: Patch
+    is-mainline: true
+  pull-request:
+    regex: ^(pull|pull\-requests|pr)[/-]
+    mode: ContinuousDeployment
+    tag: pr
+    increment: Patch
+  feature:
+    regex: ^features?[/-]
+    mode: ContinuousDeployment
+    tag: alpha
+    increment: Patch
+    source-branches:
+      - main
+
+ignore:
+  sha: []

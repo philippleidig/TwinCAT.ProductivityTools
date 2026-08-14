@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>TwinCAT.ProductivityTools.XAE</id>
+    <version>0.0.0</version>
+    <title>TwinCAT Productivity Tools - XAE integration</title>
+    <authors>Philipp Leidig</authors>
+    <projectUrl>https://github.com/philippleidig/TwinCAT.ProductivityTools</projectUrl>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <icon>icon.png</icon>
+    <tags>TwinCAT TCXAESHELL TCXAESHELL64 VS2022 VS2026</tags>
+    <summary>Meta package that pulls in the integration for every installed engineering environment.</summary>
+    <description>Meta package of the TwinCAT Productivity Tools. It depends on the integration packages for TcXaeShell, TcXaeShell 64 bit, Visual Studio 2022 and Visual Studio 2026. Each of those packages is a no-op when the matching environment is not installed.</description>
+    <dependencies>
+      <dependency id="TwinCAT.XAE.Base" version="0.0.0" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.TcXaeShell" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.TcXaeShell64" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.VS2022" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.VS2026" version="[0.0.0,)" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\_shared\icon.png" target="icon.png" />
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

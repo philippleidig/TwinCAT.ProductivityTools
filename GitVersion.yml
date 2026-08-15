@@ -12,7 +12,10 @@
 # is meant to be shippable.
 mode: Mainline
 
-major-version-bump-message: '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([\w\s-]*\))?!:'
+# GitVersion matches these without RegexOptions.Multiline, so `^` would only ever match the very
+# beginning of the message. The major pattern turns multiline matching on with `(?m)` because a
+# breaking change is announced in a footer, several lines below the subject.
+major-version-bump-message: '(?m)^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([\w\s-]*\))?!:|^BREAKING[ -]CHANGE:'
 minor-version-bump-message: '^(feat)(\([\w\s-]*\))?:'
 patch-version-bump-message: '^(build|chore|ci|docs|fix|perf|refactor|revert|style|test)(\([\w\s-]*\))?:'
 no-bump-message: '^(none|skip)(\([\w\s-]*\))?:'

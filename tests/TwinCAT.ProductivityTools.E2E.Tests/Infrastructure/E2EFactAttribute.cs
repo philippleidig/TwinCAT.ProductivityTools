@@ -153,25 +153,45 @@ namespace TwinCAT.ProductivityTools.E2E.Tests.Infrastructure
 				Environment.SpecialFolder.LocalApplicationData
 			);
 
-			foreach (string vendor in new[] { @"Microsoft\VisualStudio", @"Beckhoff\TcXaeShell" })
+			string root = Path.Combine(local, VendorFolderOf(ide.Kind));
+
+			if (!Directory.Exists(root))
 			{
-				string root = Path.Combine(local, vendor);
+				yield break;
+			}
 
-				if (!Directory.Exists(root))
+			foreach (string instance in Directory.EnumerateDirectories(root))
+			{
+				if (
+					Path.GetFileName(instance)
+						.StartsWith(ShellVersionOf(ide.Kind), StringComparison.Ordinal)
+				)
 				{
-					continue;
+					yield return Path.Combine(instance, "Extensions");
 				}
+			}
+		}
 
-				foreach (string instance in Directory.EnumerateDirectories(root))
-				{
-					if (
-						Path.GetFileName(instance)
-							.StartsWith(ShellVersionOf(ide.Kind), StringComparison.Ordinal)
-					)
-					{
-						yield return Path.Combine(instance, "Extensions");
-					}
-				}
+		/// <summary>
+		/// Folder below the local application data an IDE keeps its per user state in.
+		/// </summary>
+		/// <remarks>
+		/// The vendor has to be part of the lookup. The 64 bit TwinCAT shell reports the same
+		/// 17.0 prefix as Visual Studio 2022, so searching both vendors would report the shell as
+		/// equipped while only Visual Studio carries the extension.
+		/// </remarks>
+		private static string VendorFolderOf(IdeKind kind)
+		{
+			switch (kind)
+			{
+				case IdeKind.TcXaeShell:
+				case IdeKind.TcXaeShell64:
+					return @"Beckhoff\TcXaeShell";
+				case IdeKind.VS2022:
+				case IdeKind.VS2026:
+					return @"Microsoft\VisualStudio";
+				default:
+					throw new ArgumentOutOfRangeException(nameof(kind));
 			}
 		}
 

@@ -20,9 +20,6 @@ namespace TwinCAT.ProductivityTools.Options
 			"Full path of the Visual Studio Code executable that is used by \"Open in VS Code\". "
 				+ "Leave empty to detect the installation automatically."
 		)]
-		public string VsCodeInstallPath { get; set; } =
-			Environment.ExpandEnvironmentVariables(
-				@"%localappdata%\Programs\Microsoft VS Code\Code.exe"
-			);
+		public string VsCodeInstallPath { get; set; } = string.Empty;
 	}
 }

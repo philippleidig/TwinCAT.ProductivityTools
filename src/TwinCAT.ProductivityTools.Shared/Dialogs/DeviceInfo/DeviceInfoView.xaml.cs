@@ -12,7 +12,7 @@ namespace TwinCAT.ProductivityTools
 		{
 			InitializeComponent();
 
-			this.Title = "Device Info Remote";
+			this.Title = "Device Info";
 
 			viewModel = new DeviceInfoViewModel(target);
 			DataContext = viewModel;

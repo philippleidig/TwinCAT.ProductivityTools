@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TwinCAT.Ads;
 
@@ -20,22 +13,43 @@ namespace TwinCAT.ProductivityTools
 		public DeviceInfoViewModel(AmsNetId target)
 		{
 			Target = target;
+			TargetName = NameOf(target);
+		}
+
+		/// <summary>
+		/// Resolves the route name of the target, falling back to its AmsNetID.
+		/// </summary>
+		/// <remarks>
+		/// A target does not have to be routed: the local system never is, and a target that was
+		/// entered by hand may not be either. Neither case is an error, so the dialog shows the
+		/// AmsNetID instead of an empty caption. Reading the routes touches the file system, which
+		/// is why the failure is tolerated as well.
+		/// </remarks>
+		private static string NameOf(AmsNetId target)
+		{
+			if (target == null)
+			{
+				return string.Empty;
+			}
+
+			if (AmsNetId.Local.Equals(target))
+			{
+				return "Local";
+			}
+
 			try
 			{
-				if (AmsNetId.Local.Equals(target))
-				{
-					TargetName = "Local";
-				}
-				else
-				{
-					TargetName = AmsRouter
-						.ListRoutes()
-						.Where(x => x.NetId == Target.ToString())
-						.FirstOrDefault()
-						.Name;
-				}
+				string name = AmsRouter
+					.ListRoutes()
+					.FirstOrDefault(route => route.NetId == target.ToString())
+					?.Name;
+
+				return string.IsNullOrEmpty(name) ? target.ToString() : name;
 			}
-			catch { }
+			catch (Exception)
+			{
+				return target.ToString();
+			}
 		}
 
 		public async Task InitializeAsync()
@@ -57,10 +71,6 @@ namespace TwinCAT.ProductivityTools
 					Functions.Add(function);
 				}
 			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
 			finally
 			{
 				IsBusy = false;
@@ -71,7 +81,11 @@ namespace TwinCAT.ProductivityTools
 		public bool IsBusy
 		{
 			get => _isBusy;
-			private set { _isBusy = value; }
+			private set
+			{
+				_isBusy = value;
+				OnPropertyChanged(nameof(IsBusy));
+			}
 		}
 
 		private ObservableCollection<Function> _functions;
@@ -81,7 +95,7 @@ namespace TwinCAT.ProductivityTools
 			private set
 			{
 				_functions = value;
-				OnPropertyChanged("Functions");
+				OnPropertyChanged(nameof(Functions));
 			}
 		}
 
@@ -92,7 +106,7 @@ namespace TwinCAT.ProductivityTools
 			set
 			{
 				_deviceInfo = value;
-				OnPropertyChanged("DeviceInfo");
+				OnPropertyChanged(nameof(DeviceInfo));
 			}
 		}
 
@@ -103,7 +117,7 @@ namespace TwinCAT.ProductivityTools
 			private set
 			{
 				_target = value;
-				OnPropertyChanged("Target");
+				OnPropertyChanged(nameof(Target));
 			}
 		}
 
@@ -114,7 +128,7 @@ namespace TwinCAT.ProductivityTools
 			private set
 			{
 				_targetName = value;
-				OnPropertyChanged("TargetName");
+				OnPropertyChanged(nameof(TargetName));
 			}
 		}
 	}

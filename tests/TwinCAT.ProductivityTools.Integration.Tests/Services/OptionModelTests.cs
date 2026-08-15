@@ -30,12 +30,14 @@ namespace TwinCAT.ProductivityTools.Integration.Tests.Services
 		}
 
 		[Fact]
-		public void TheDefaultVsCodePathPointsAtAPerUserInstallation()
+		public void TheVsCodePathIsEmptyUntilItIsDetected()
 		{
-			string path = new General().VsCodeInstallPath;
-
-			path.Should().EndWith(@"Programs\Microsoft VS Code\Code.exe");
-			path.Should().NotContain("%", "the environment variables have to be expanded already");
+			// A hard coded per user path is wrong on a machine with a system wide installation,
+			// and it puts the account name of whoever installed the extension into the options
+			// grid. An empty value makes the command detect the installation instead.
+			new General()
+				.VsCodeInstallPath.Should()
+				.BeEmpty();
 		}
 
 		[Theory]

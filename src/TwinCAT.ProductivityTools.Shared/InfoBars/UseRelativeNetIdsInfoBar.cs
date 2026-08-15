@@ -33,9 +33,10 @@ namespace TwinCAT.ProductivityTools.InfoBars
 				new[]
 				{
 					new InfoBarTextSpan(
-						"TwinCAT ProductivityTools Recommendation: Use relative AmsNetIDs !		"
+						"This TwinCAT project stores absolute AmsNetIDs. Relative AmsNetIDs keep "
+							+ "the engineering station out of the project files. "
 					),
-					new InfoBarButton("ACTIVATE")
+					new InfoBarButton("Use relative NetIds")
 				},
 				KnownMonikers.SettingsGroupWarning,
 				true

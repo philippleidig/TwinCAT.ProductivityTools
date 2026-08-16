@@ -1,9 +1,9 @@
-﻿using Community.VisualStudio.Toolkit;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using Community.VisualStudio.Toolkit;
+using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using TCatSysManagerLib;
 using TwinCAT.ProductivityTools.Extensions;
 using TwinCAT.ProductivityTools.Helpers;
@@ -13,45 +13,58 @@ using Task = System.Threading.Tasks.Task;
 namespace TwinCAT.ProductivityTools.Commands
 {
 	[Command(PackageIds.OpenInVsCodeCommandId)]
-	internal sealed class OpenVsCodeCommand : BaseCommand<OpenVsCodeCommand>
+	internal sealed class OpenInVsCodeCommand : BaseCommand<OpenInVsCodeCommand>
 	{
 		protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
 		{
-			var dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-			var selectedItem = dte?.SelectedItems?.Item(1).ProjectItem;
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			string filePath = selectedItem.Properties.Item("FullPath").Value.ToString();
+			var dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+			ProjectItem selectedItem = dte.GetSelectedProjectItem();
 
 			if (!(selectedItem?.Object is ITcSmTreeItem treeItem))
 			{
 				return;
 			}
 
+			string filePath = selectedItem.Properties?.Item("FullPath")?.Value?.ToString();
+
+			if (string.IsNullOrEmpty(filePath))
+			{
+				await VS.MessageBox.ShowErrorAsync(
+					Vsix.Name,
+					"The selected item does not have a file system path."
+				);
+				return;
+			}
+
 			if (treeItem.IsPlcProjectFolder())
 			{
-				await OpenFolderInVsAsync(filePath);
+				await OpenFolderInVsCodeAsync(filePath);
 			}
-			else 
+			else
 			{
-				await OpenFileInVsAsync(filePath);
+				await OpenFileInVsCodeAsync(filePath);
 			}
 		}
 
-		private async Task OpenFileInVsAsync(string path)
+		private async Task OpenFileInVsCodeAsync(string path)
 		{
-			if (!File.Exists(path)) 
+			if (!File.Exists(path))
 			{
-				// await VS.MessageBox.ShowErrorAsync();
+				await VS.MessageBox.ShowErrorAsync(Vsix.Name, "File not found: " + path);
+				return;
 			}
 
 			OpenVsCode(path);
 		}
 
-		private async Task OpenFolderInVsAsync(string path)
+		private async Task OpenFolderInVsCodeAsync(string path)
 		{
 			if (!Directory.Exists(path))
 			{
-				// await VS.MessageBox.ShowErrorAsync();
+				await VS.MessageBox.ShowErrorAsync(Vsix.Name, "Folder not found: " + path);
+				return;
 			}
 
 			OpenVsCode(path);
@@ -59,10 +72,14 @@ namespace TwinCAT.ProductivityTools.Commands
 
 		private void OpenVsCode(string path)
 		{
-			EnsurePathExist();
+			if (!EnsurePathExist())
+			{
+				return;
+			}
+
 			bool isDirectory = Directory.Exists(path);
 
-			var args = isDirectory ? "." : path;
+			var args = isDirectory ? "." : $"\"{path}\"";
 
 			var start = new System.Diagnostics.ProcessStartInfo()
 			{
@@ -81,50 +98,48 @@ namespace TwinCAT.ProductivityTools.Commands
 			using (System.Diagnostics.Process.Start(start)) { }
 		}
 
-		private void EnsurePathExist()
+		/// <summary>
+		/// Makes sure the configured Code.exe exists, detecting it or asking the user when it does
+		/// not.
+		/// </summary>
+		/// <returns><c>false</c> when Visual Studio Code could not be located.</returns>
+		private bool EnsurePathExist()
 		{
 			if (File.Exists(General.Instance.VsCodeInstallPath))
-				return;
+				return true;
 
-			if (!string.IsNullOrEmpty(VsCodeDetect.InRegistry()))
+			string detected = new VsCodeLocator().Locate();
+
+			if (!string.IsNullOrEmpty(detected))
 			{
-				SaveVsCodeInstallPath(VsCodeDetect.InRegistry());
+				SaveVsCodeInstallPath(detected);
+				return true;
 			}
-			else if (!string.IsNullOrEmpty(VsCodeDetect.InEnvVarPath()))
+
+			var isConfirmed = VS.MessageBox.ShowConfirm(
+				Vsix.Name,
+				"I can't find Visual Studio Code (Code.exe). Would you like to help me find it?"
+			);
+
+			if (!isConfirmed)
+				return false;
+
+			var dialog = new OpenFileDialog
 			{
-				SaveVsCodeInstallPath(VsCodeDetect.InEnvVarPath());
-			}
-			else if (!string.IsNullOrEmpty(VsCodeDetect.InLocalAppData()))
-			{
-				SaveVsCodeInstallPath(VsCodeDetect.InLocalAppData());
-			}
-			else
-			{
-				var isConfirmed = VS.MessageBox.ShowConfirm(
-					Vsix.Name,
-					"I can't find Visual Studio Code (Code.exe). Would you like to help me find it?"
-				);
+				DefaultExt = ".exe",
+				FileName = "Code.exe",
+				InitialDirectory = Environment.GetFolderPath(
+					Environment.SpecialFolder.ProgramFiles
+				),
+				CheckFileExists = true,
+			};
 
-				if (!isConfirmed)
-					return;
+			if (dialog.ShowDialog() != DialogResult.OK)
+				return false;
 
-				var dialog = new OpenFileDialog
-				{
-					DefaultExt = ".exe",
-					FileName = "Code.exe",
-					InitialDirectory = Environment.GetFolderPath(
-						Environment.SpecialFolder.ProgramFiles
-					),
-					CheckFileExists = true
-				};
+			SaveVsCodeInstallPath(dialog.FileName);
 
-				var result = dialog.ShowDialog();
-
-				if (result == DialogResult.OK)
-				{
-					SaveVsCodeInstallPath(dialog.FileName);
-				}
-			}
+			return true;
 		}
 
 		private void SaveVsCodeInstallPath(string path)

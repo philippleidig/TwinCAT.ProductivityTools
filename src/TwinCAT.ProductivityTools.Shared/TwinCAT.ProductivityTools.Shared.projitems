@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -10,16 +10,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IOutputWindowPane.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\DeleteBuildArtifactsOnCleanCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\PlcTextRewriteCommandBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\DeviceInfoCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\TargetCommandBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\BackgroundWork.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Report.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\UndoContextScope.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plc\PlcTextRewriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\BuildArtifactCleanupService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\OutputWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IProjectFreezerService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Abstractions\ITargetSystemService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\CheckAllObjectsCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\DeleteBuildArtifactsOnCleanCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\DeviceInfoCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CellTemplateDataGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\IO\ShowIOMappingToolWindowCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\OpenLoggedEventsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\FreezeProjectCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\OpenInVsCodeCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\IO\EnableAdsServerCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\MOTION\GenerateNcCamTablePlcCodeCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\OpenInFileExplorerCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\RebootCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\RemoteDesktopCommand.cs" />
@@ -27,7 +34,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\PLC\RemoveRegionsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\RteInstallCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\SetTickCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\SavePlcLibraryOnBuildCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Target\ShutdownCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\UseRelativeNetIdsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\BaseDialogWindow.cs" />
@@ -40,32 +46,24 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\RteInstall\TcRteInstallViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\AsyncPackageExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Extensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\AdsRoute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\AmsRouter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\DeviceInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\Function.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\Helpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\LocalAreaConnection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\NetworkManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\AdsRegistry.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\RemoteControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\RemoteDesktop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DteExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\SolutionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TcSmTreeItemExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TcSysManagerExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileFilter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileFilterProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\FileSystem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\VsCodeDetect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InfoBars\BaseInfoBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InfoBars\UseRelativeNetIdsInfoBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Options\Build.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Options\General.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProductivityToolsPackage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TargetSelectionMonitor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\OutputWindowPane.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\TargetSystemService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\ProjectFreezerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingToolWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingToolWindowControl.xaml.cs">
+      <DependentUpon>IOMappingToolWindowControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TreeListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TreeListViewExpander.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Dialogs\DeviceInfo\DeviceInfoView.xaml">
@@ -76,10 +74,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)ToolWindows\IOMappingToolWindowControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Commands\IO\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Commands\MOTION\" />
     <Folder Include="$(MSBuildThisFileDirectory)Commands\SYSTEM\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Controls\" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>TwinCAT.ProductivityTools.XAE.TcXaeShell64</id>
+    <version>0.0.0</version>
+    <title>TwinCAT Productivity Tools - TcXaeShell 64 bit</title>
+    <authors>Philipp Leidig</authors>
+    <projectUrl>https://github.com/philippleidig/TwinCAT.ProductivityTools</projectUrl>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <icon>icon.png</icon>
+    <tags>TwinCAT TCXAESHELL64</tags>
+    <summary>TwinCAT Productivity Tools - TcXaeShell 64 bit.</summary>
+    <description>Integrates the TwinCAT Productivity Tools into the 64 bit TcXaeShell that ships with TwinCAT 4026. The package does nothing when that shell is not installed.</description>
+    <dependencies />
+  </metadata>
+  <files>
+    <file src="..\_shared\icon.png" target="icon.png" />
+    <file src="..\_shared\IdeIntegration.psm1" target="tools\IdeIntegration.psm1" />
+    <file src="tools\**" target="tools" />
+    <file src="..\..\artifacts\vsix\x64\**" target="tools\extension" />
+  </files>
+</package>

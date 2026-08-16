@@ -1,176 +1,233 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
-using EnvDTE80;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using TCatSysManagerLib;
-using Project = Community.VisualStudio.Toolkit.Project;
 using Task = System.Threading.Tasks.Task;
 
 namespace TwinCAT.ProductivityTools.Extensions
 {
+	/// <summary>
+	/// Finds the TwinCAT projects of the current solution.
+	/// </summary>
+	/// <remarks>
+	/// Every lookup tolerates a failing COM call. The TwinCAT project system throws while a
+	/// project is loading, unloading or being reloaded after a target change, and these helpers
+	/// are used from <c>BeforeQueryStatus</c>, where an exception breaks the whole context menu.
+	/// </remarks>
 	internal static class SolutionExtensions
 	{
 		public static bool IsTwinCATProjectLoaded(this Solutions solutions)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			if (!HierarchyUtilities.IsSolutionOpen)
 			{
 				return false;
 			}
 
-			EnvDTE.DTE dte = VS.GetRequiredService<DTE, DTE>();
-
-			var projects = dte.Solution.Projects.Cast<EnvDTE.Project>().ToList();
-
-			foreach (EnvDTE.Project project in projects)
+			try
 			{
-				try
-				{
-					ITcSysManager2 systemManager = project.Object as ITcSysManager2;
+				DTE dte = VS.GetRequiredService<DTE, DTE>();
 
-					if (systemManager != null)
-					{
-						return true;
-					}
-				}
-				catch { }
+				return AllProjects(dte?.Solution).Any(project => SystemManagerOf(project) != null);
 			}
-
-			return false;
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		public static async Task<ITcSysManager2> GetActiveTwinCATProjectSystemManagerAsync(
 			this Solutions solutions
 		)
 		{
-			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			if (
-				dte?.ActiveSolutionProjects is Array activeSolutionProjects
-				&& activeSolutionProjects?.Length > 0
-			)
+			DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+
+			return SystemManagerOf(ActiveProject(dte));
+		}
+
+		/// <summary>
+		/// Synchronous counterpart of <see cref="GetActiveTwinCATProjectSystemManagerAsync"/>.
+		/// Required by <c>BeforeQueryStatus</c>, which the shell calls synchronously while the
+		/// menu is being built. An asynchronous lookup would complete after the menu item has
+		/// already been rendered and therefore could never affect its visibility or enabled state.
+		/// </summary>
+		public static ITcSysManager2 GetActiveTwinCATProjectSystemManager(this Solutions solutions)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			if (!HierarchyUtilities.IsSolutionOpen)
 			{
-				var project = activeSolutionProjects?.GetValue(0) as EnvDTE.Project;
-				try
-				{
-					ITcSysManager2 systemManager = project.Object as ITcSysManager2;
-
-					if (systemManager != null)
-					{
-						return systemManager;
-					}
-				}
-				catch { }
+				return null;
 			}
 
-			return null;
+			try
+			{
+				DTE dte = VS.GetRequiredService<DTE, DTE>();
+
+				return SystemManagerOf(ActiveProject(dte));
+			}
+			catch (Exception)
+			{
+				return null;
+			}
 		}
 
 		public static async Task<EnvDTE.Project> GetActiveTwinCATProjectAsync(
 			this Solutions solutions
 		)
 		{
-			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			if (
-				dte?.ActiveSolutionProjects is Array activeSolutionProjects
-				&& activeSolutionProjects?.Length > 0
-			)
-			{
-				var project = activeSolutionProjects?.GetValue(0) as EnvDTE.Project;
-				try
-				{
-					ITcSysManager2 systemManager = project.Object as ITcSysManager2;
+			DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
 
-					if (systemManager != null)
-					{
-						return project;
-					}
-				}
-				catch { }
-			}
+			EnvDTE.Project project = ActiveProject(dte);
 
-			return null;
+			return SystemManagerOf(project) == null ? null : project;
 		}
 
 		public static async Task<IEnumerable<EnvDTE.Project>> GetAllTwinCATProjectsAsync(
 			this Solutions solutions
 		)
 		{
-			var twincatProjects = new List<EnvDTE.Project>();
-
-			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-
-			var projects = dte.Solution.Projects.Cast<EnvDTE.Project>().ToList();
-
-			foreach (EnvDTE.Project project in projects)
-			{
-				try
-				{
-					ITcSysManager2 systemManager = project.Object as ITcSysManager2;
-
-					if (systemManager != null)
-					{
-						twincatProjects.Add(project);
-					}
-				}
-				catch { }
-			}
-
-			return twincatProjects;
-		}
-
-		public static async Task UnloadAlltwinCATProjectsAsync(this Solutions solutions)
-		{
-			await VS.Solutions.SaveAsync();
-
-			IEnumerable<Project> projects = await VS.Solutions.GetAllProjectsAsync();
-
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			foreach (var project in projects)
-			{
-				var isTwinCATProject = project.FullPath.EndsWith(".tsproj");
+			DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
 
-				if (isTwinCATProject && project.IsLoaded)
-				{
-					await project.SaveAsync();
-					await project.UnloadAsync();
-				}
-			}
+			return AllProjects(dte?.Solution)
+				.Where(project => SystemManagerOf(project) != null)
+				.ToList();
 		}
 
-		public static async Task LoadAllTwinCATProjectsAsync(this Solutions solutions)
-		{
-			await VS.Solutions.SaveAsync();
-
-			IEnumerable<Project> projects = await VS.Solutions.GetAllProjectsAsync();
-
-			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-			foreach (var project in projects)
-			{
-				var isTwinCATProject = project.FullPath.EndsWith(".tsproj");
-
-				if (isTwinCATProject && !project.IsLoaded)
-				{
-					await project.SaveAsync();
-					await project.LoadAsync();
-				}
-			}
-		}
-
+		/// <summary>
+		/// Saves the solution and everything in it.
+		/// </summary>
+		/// <remarks>
+		/// <c>Solution.SaveAs</c> with the path of the solution itself is the documented way to
+		/// save a solution, but it throws for a solution that has never been saved, because its
+		/// <c>FullName</c> is empty. Such a solution has nothing to save either.
+		/// </remarks>
 		public static async Task SaveAsync(this Solutions solutions)
 		{
-			EnvDTE.DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
-			dte?.Solution?.SaveAs(dte?.Solution?.FullName);
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+			try
+			{
+				DTE dte = await VS.GetRequiredServiceAsync<DTE, DTE>();
+
+				EnvDTE.Solution solution = dte?.Solution;
+				string path = solution?.FullName;
+
+				if (string.IsNullOrEmpty(path))
+				{
+					return;
+				}
+
+				solution.SaveAs(path);
+			}
+			catch (Exception)
+			{
+				// Saving is a convenience after a modification. The modification itself has
+				// already been applied to the in memory project.
+			}
 		}
+
+		private static EnvDTE.Project ActiveProject(DTE dte)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			try
+			{
+				if (
+					dte?.ActiveSolutionProjects is Array activeProjects
+					&& activeProjects.Length > 0
+				)
+				{
+					return activeProjects.GetValue(0) as EnvDTE.Project;
+				}
+			}
+			catch (Exception) { }
+
+			return null;
+		}
+
+		private static ITcSysManager2 SystemManagerOf(EnvDTE.Project project)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			try
+			{
+				return project?.Object as ITcSysManager2;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Flattens the solution, because projects inside a solution folder are not part of
+		/// <c>Solution.Projects</c> themselves - the folder is, and it carries them as items.
+		/// </summary>
+		private static IEnumerable<EnvDTE.Project> AllProjects(EnvDTE.Solution solution)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
+
+			try
+			{
+				foreach (EnvDTE.Project project in solution?.Projects ?? EmptyProjects())
+				{
+					Collect(project, projects, 0);
+				}
+			}
+			catch (Exception) { }
+
+			return projects;
+		}
+
+		private static void Collect(
+			EnvDTE.Project project,
+			List<EnvDTE.Project> projects,
+			int depth
+		)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			if (project == null || depth > MaximumSolutionFolderDepth)
+			{
+				return;
+			}
+
+			projects.Add(project);
+
+			try
+			{
+				if (project.Kind != SolutionFolderKind || project.ProjectItems == null)
+				{
+					return;
+				}
+
+				foreach (ProjectItem item in project.ProjectItems)
+				{
+					Collect(item?.SubProject, projects, depth + 1);
+				}
+			}
+			catch (Exception) { }
+		}
+
+		private static System.Collections.IEnumerable EmptyProjects() =>
+			Array.Empty<EnvDTE.Project>();
+
+		private const string SolutionFolderKind = "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}";
+		private const int MaximumSolutionFolderDepth = 16;
 	}
 }

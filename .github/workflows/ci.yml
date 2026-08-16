@@ -1,0 +1,118 @@
+name: CI
+
+# Verifies every change before it reaches main. Nothing is published here - the release workflow
+# owns that, so that a build cannot be released twice with different content.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  Configuration: Release
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # GitVersion needs the full history to derive a version from the commits.
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.0.0
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3.0.0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Check formatting
+        run: dotnet csharpier --check .
+
+      - name: Stamp version
+        run: ./build/Set-Version.ps1 -Version '${{ steps.gitversion.outputs.assemblySemVer }}'
+        shell: pwsh
+
+      - name: Build
+        run: msbuild TwinCAT.ProductivityTools.sln -restore -v:m -p:Configuration=Release -p:DeployExtension=false -p:ZipPackageCompressionLevel=normal
+
+      # Coverage is collected with the profiler based collector that ships with the test SDK.
+      # Coverlet rewrites the IL of the assemblies it instruments, which invalidates the strong
+      # name of TwinCAT.ProductivityTools.Core and makes every test that touches it fail on
+      # .NET Framework with a FileLoadException.
+      - name: Test
+        run: >
+          dotnet test tests/TwinCAT.ProductivityTools.Core.Tests/TwinCAT.ProductivityTools.Core.Tests.csproj
+          --configuration Release
+          --no-restore
+          --logger "trx;LogFileName=core.trx"
+          --collect:"Code Coverage;Format=Cobertura"
+          --results-directory artifacts/test-results
+          --filter "Category!=E2E"
+
+      - name: Integration test
+        run: >
+          dotnet test tests/TwinCAT.ProductivityTools.Integration.Tests/TwinCAT.ProductivityTools.Integration.Tests.csproj
+          --configuration Release
+          --no-restore
+          --logger "trx;LogFileName=integration.trx"
+          --collect:"Code Coverage;Format=Cobertura"
+          --results-directory artifacts/test-results
+          --filter "Category!=E2E"
+
+      - name: Report coverage
+        if: always()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
+        with:
+          # The collector names the file after the agent and the run, so it cannot be matched by
+          # a fixed file name.
+          reports: artifacts/test-results/**/*.cobertura.xml
+          targetdir: artifacts/coverage
+          reporttypes: MarkdownSummaryGithub;Cobertura
+          # The collector also instruments the test assemblies themselves. Reporting them would
+          # inflate the figure with the coverage the tests trivially have of their own code.
+          assemblyfilters: -*.Tests
+          title: TwinCAT.ProductivityTools
+
+      - name: Publish coverage to the job summary
+        if: always()
+        shell: pwsh
+        run: |
+          $summary = 'artifacts/coverage/SummaryGithub.md'
+          if (Test-Path $summary) {
+            Get-Content $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: artifacts/test-results/**/*.trx
+          if-no-files-found: warn
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ steps.gitversion.outputs.semVer }}
+          path: src/**/bin/Release/*.vsix
+          if-no-files-found: error

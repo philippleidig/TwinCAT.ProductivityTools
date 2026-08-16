@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>TwinCAT.ProductivityTools</id>
+    <version>0.0.0</version>
+    <title>TwinCAT Productivity Tools</title>
+    <authors>Philipp Leidig</authors>
+    <projectUrl>https://github.com/philippleidig/TwinCAT.ProductivityTools</projectUrl>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <icon>icon.png</icon>
+    <tags>TwinCAT Workload VariantXAE CategoryTools</tags>
+    <summary>Productivity commands for TwinCAT XAE.</summary>
+    <description>Installs the TwinCAT Productivity Tools into every supported engineering environment on this machine and deploys the optimized PLC project template. The extension adds commands for PLC housekeeping, target system maintenance, I/O mapping export and project freezing to TwinCAT XAE.</description>
+    <packageTypes>
+      <packageType name="Workload" />
+    </packageTypes>
+    <dependencies>
+      <dependency id="TwinCAT.ProductivityTools.Config" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE" version="[0.0.0,)" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\_shared\icon.png" target="icon.png" />
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

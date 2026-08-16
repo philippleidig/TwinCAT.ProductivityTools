@@ -1,0 +1,51 @@
+name: E2E
+
+# The end to end tests drive a real IDE with a real TwinCAT installation. A GitHub hosted runner
+# has neither, so this workflow is started by hand on a machine that does.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ide:
+        description: IDE the tests drive
+        type: choice
+        default: TcXaeShell64
+        options:
+          - TcXaeShell64
+          - VS2022
+          - VS2026
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: End to end
+    runs-on: [self-hosted, windows, twincat]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build
+        run: msbuild TwinCAT.ProductivityTools.sln -restore -v:m -p:Configuration=Release -p:DeployExtension=false
+
+      - name: Run the end to end tests
+        env:
+          TCPT_E2E_IDE: ${{ inputs.ide }}
+        run: >
+          dotnet test tests/TwinCAT.ProductivityTools.E2E.Tests/TwinCAT.ProductivityTools.E2E.Tests.csproj
+          --configuration Release
+          --logger "trx;LogFileName=e2e.trx"
+          --results-directory artifacts/test-results
+          --filter "Category=E2E"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-${{ inputs.ide }}
+          path: artifacts/test-results/**/*.trx
+          if-no-files-found: warn

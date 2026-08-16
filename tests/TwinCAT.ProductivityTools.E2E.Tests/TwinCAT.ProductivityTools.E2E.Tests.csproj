@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    These tests drive a real IDE with a real TwinCAT installation over COM automation. Nothing here
+    is mocked: the IDE is started, a TwinCAT solution is created on disk, commands are invoked the
+    way a user invokes them and the result is read back from the project.
+
+    That is why the project is excluded from CI by the Category=E2E trait. On a machine without the
+    prerequisites every test reports itself as skipped instead of failing, so running the whole test
+    suite locally stays harmless.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>TwinCAT.ProductivityTools.E2E.Tests</RootNamespace>
+    <AssemblyName>TwinCAT.ProductivityTools.E2E.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <!--
+      The x64 shells and the TwinCAT automation interface are 64 bit. COM would marshal across the
+      boundary, but keeping the test host on the same bitness avoids a class of surprises.
+    -->
+    <PlatformTarget>x64</PlatformTarget>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EnvDTE" Version="17.10.40170" />
+    <PackageReference Include="EnvDTE80" Version="17.10.40170" />
+    <PackageReference Include="TcSysManagerLib" Version="3.3.0" />
+
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TwinCAT.ProductivityTools.Core\TwinCAT.ProductivityTools.Core.csproj" />
+  </ItemGroup>
+
+</Project>

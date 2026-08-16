@@ -1,30 +1,38 @@
 ﻿using System.Windows;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using TwinCAT.Ads;
 
 namespace TwinCAT.ProductivityTools
 {
-    /// <summary>
-    /// Interaktionslogik für TcRteInstallView.xaml
-    /// </summary>
-    public partial class TcRteInstallView : BaseDialogWindow
-    {
-        public TcRteInstallView(string target)
-        {
-            InitializeComponent();
+	/// <summary>
+	/// Interaktionslogik für TcRteInstallView.xaml
+	/// </summary>
+	public partial class TcRteInstallView : BaseDialogWindow
+	{
+		public TcRteInstallView(string target)
+		{
+			InitializeComponent();
 
-            this.Title = "TcRteInstall Remote";
+			this.Title = "TcRteInstall Remote";
 
-            viewModel = new TcRteInstallViewModel(target);
-            DataContext = viewModel;
+			viewModel = new TcRteInstallViewModel(target);
+			DataContext = viewModel;
 
-            Loaded += OnLoaded;
-        }
+			Loaded += OnLoaded;
+		}
 
-        private async void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            await viewModel.InitializeAsync();
-        }
+		// A dialog must not be opened with "async void". An exception from the load would
+		// otherwise be raised on the message pump and take the whole IDE down instead of the
+		// dialog.
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			Helpers.BackgroundWork.Run(
+				() => viewModel.InitializeAsync(),
+				"Failed to read the target information."
+			);
+		}
 
-        private TcRteInstallViewModel viewModel;
-    }
+		private TcRteInstallViewModel viewModel;
+	}
 }

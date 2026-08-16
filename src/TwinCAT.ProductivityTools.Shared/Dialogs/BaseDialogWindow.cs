@@ -2,12 +2,12 @@
 
 namespace TwinCAT.ProductivityTools
 {
-    public class BaseDialogWindow : DialogWindow
+	public class BaseDialogWindow : DialogWindow
 	{
-        public BaseDialogWindow()
-        {
-            this.HasMaximizeButton = true;
-            this.HasMinimizeButton = true;
-        }
-    }
+		public BaseDialogWindow()
+		{
+			this.HasMaximizeButton = true;
+			this.HasMinimizeButton = true;
+		}
+	}
 }

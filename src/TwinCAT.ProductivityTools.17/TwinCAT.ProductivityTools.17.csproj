@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
@@ -19,7 +19,6 @@
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProjectGuid>{710545A5-E083-4F4C-A7AC-C0F8B2E1F255}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TwinCAT.ProductivityTools</RootNamespace>
     <AssemblyName>TwinCAT.ProductivityTools.17</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -44,7 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>.\bin\Release\Package</CopyVsixExtensionLocation>
-    <DeployExtension>False</DeployExtension>
+    <DeployExtension>True</DeployExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -57,20 +56,6 @@
     <CopyVsixExtensionLocation>.\bin\Release\Package</CopyVsixExtensionLocation>
     <DeployExtension>False</DeployExtension>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\SharedFiles\Commands.cs">
-      <Link>Commands.cs</Link>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Commands.vsct</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="source.extension.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>source.extension.vsixmanifest</DependentUpon>
-    </Compile>
-  </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\LICENSE.md">
       <Link>LICENSE.md</Link>
@@ -101,10 +86,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Beckhoff.TwinCAT.Ads">
-      <Version>6.1.312</Version>
+      <Version>7.0.172</Version>
     </PackageReference>
     <PackageReference Include="Community.VisualStudio.Toolkit.17">
-      <Version>17.0.527</Version>
+      <Version>17.0.549</Version>
     </PackageReference>
     <PackageReference Include="Community.VisualStudio.VSCT">
       <Version>16.0.29.6</Version>
@@ -112,7 +97,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm">
-      <Version>8.2.2</Version>
+      <Version>8.4.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -121,13 +106,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
+      <Version>1.1.142</Version>
+    </PackageReference>
     <PackageReference Include="TcSysManagerLib">
       <Version>3.3.0</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.2.2186" />
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="..\SharedFiles\Commands.vsct">
@@ -152,7 +136,26 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="..\SharedFiles\Commands.cs">
+      <Link>Commands.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Commands.vsct</DependentUpon>
+    </Compile>
+    <Compile Include="source.extension.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>source.extension.vsixmanifest</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TwinCAT.ProductivityTools.Core\TwinCAT.ProductivityTools.Core.csproj">
+      <Name>TwinCAT.ProductivityTools.Core</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+  </ItemGroup>  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="..\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems" Label="Shared" />
 </Project>

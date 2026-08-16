@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The whole shared project is compiled into this test assembly, exactly like the two VSIX
+    projects do. That is what makes it an integration test project: the code under test is the
+    real command, service and view model code including its Visual Studio dependencies, and the
+    shell underneath it is the mock of Microsoft.VisualStudio.Sdk.TestFramework rather than a
+    running IDE. A test can therefore run on a build agent that has neither Visual Studio nor
+    TwinCAT installed.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>TwinCAT.ProductivityTools.Integration.Tests</RootNamespace>
+    <AssemblyName>TwinCAT.ProductivityTools.Integration.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <UseWPF>true</UseWPF>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!--
+      The shared project carries the analyzers of the VS SDK. They are meant for an extension
+      assembly and flag patterns that are deliberate in a test, so they are not treated as errors
+      here. The VSIX projects still build them with the full rule set.
+    -->
+    <NoWarn>$(NoWarn);VSTHRD002;VSTHRD010;VSTHRD100;VSTHRD200;VSSDK006;CS0618;CVSTBLD002</NoWarn>
+    <!--
+      The toolkit pins Newtonsoft.Json for the shipping VSIX because the shell provides it. A test
+      host is not the shell, so the check does not apply here.
+    -->
+    <SkipNewtonsoftJsonVersionCheck>true</SkipNewtonsoftJsonVersionCheck>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="7.0.172" />
+    <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.549" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
+    <PackageReference Include="TcSysManagerLib" Version="3.3.0" />
+
+    <PackageReference Include="Microsoft.VisualStudio.Sdk.TestFramework" Version="17.11.66" />
+    <PackageReference Include="Microsoft.VisualStudio.Sdk.TestFramework.Xunit" Version="17.11.66" />
+
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TwinCAT.ProductivityTools.Core\TwinCAT.ProductivityTools.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Both files are generated into the VSIX projects by the VSSDK targets, which do not run here.
+      The checked in copies are compiled instead so the command identifiers the tests assert on are
+      the very same constants the extension uses.
+    -->
+    <Compile Include="..\..\src\SharedFiles\Commands.cs" Link="Generated\Commands.cs" />
+    <Compile Include="..\..\src\TwinCAT.ProductivityTools.17\source.extension.cs" Link="Generated\source.extension.cs" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\TwinCAT.ProductivityTools.Shared\TwinCAT.ProductivityTools.Shared.projitems" Label="Shared" />
+
+</Project>

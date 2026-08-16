@@ -33,6 +33,34 @@ extension is replaced keeps the old files loaded until it is restarted.
 The extension is also published as a TcPkg workload, which is the more convenient route on a
 machine that is provisioned with `tcpkg`.
 
+### Registering the feed
+
+The packages are published to GitHub Packages, not to one of the Beckhoff feeds, so the source
+has to be registered once. The feed is a NuGet v3 service index:
+
+```
+https://nuget.pkg.github.com/philippleidig/index.json
+```
+
+GitHub Packages requires authentication on its NuGet registry **even for public packages** — an
+anonymous request answers `401`. Create a classic personal access token with the `read:packages`
+scope and register the source from an elevated PowerShell, because `tcpkg` writes to the machine
+wide configuration:
+
+```powershell
+'<your-token>' | tcpkg source add `
+    --name GitHub `
+    --source https://nuget.pkg.github.com/philippleidig/index.json `
+    --user <your-github-username> `
+    --password-stdin `
+    --priority 7
+```
+
+The Beckhoff feeds occupy priorities 1 to 6, so 7 keeps this source below them and leaves the
+resolution of TwinCAT's own packages untouched. Verify it with `tcpkg source list`.
+
+### Installing
+
 ```powershell
 tcpkg install TwinCAT.ProductivityTools
 ```

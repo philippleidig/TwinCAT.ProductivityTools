@@ -24,6 +24,9 @@ the item you selected.
 tcpkg install TwinCAT.ProductivityTools
 ```
 
+The packages live on GitHub Packages, so that feed has to be registered once before the command
+above resolves — see [docs/installation.md](docs/installation.md#registering-the-feed).
+
 …or download the installer from the
 [latest release](https://github.com/philippleidig/TwinCAT.ProductivityTools/releases/latest) and
 pick the environments to install into. Both routes are described in

@@ -26,11 +26,26 @@ namespace TwinCAT.ProductivityTools.Tests.Architecture
 			"System.Windows.Forms",
 		};
 
+		/// <summary>
+		/// Code coverage instrumentation adds a reference to its own shim to the assembly it
+		/// instruments. That reference only exists while the suite runs under a collector, it is
+		/// not part of the shipped library, and its name would otherwise trip the
+		/// Microsoft.VisualStudio prefix below.
+		/// </summary>
+		private static readonly string[] InstrumentationAssemblies =
+		{
+			"Microsoft.VisualStudio.CodeCoverage.Shim",
+		};
+
 		[Fact]
 		public void The_core_library_does_not_reference_the_visual_studio_shell()
 		{
 			IEnumerable<string> referenced = Core.GetReferencedAssemblies()
-				.Select(name => name.Name);
+				.Select(name => name.Name)
+				.Where(
+					name =>
+						!InstrumentationAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase)
+				);
 
 			referenced
 				.Should()

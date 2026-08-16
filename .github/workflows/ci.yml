@@ -55,13 +55,17 @@ jobs:
       - name: Build
         run: msbuild TwinCAT.ProductivityTools.sln -restore -v:m -p:Configuration=Release -p:DeployExtension=false -p:ZipPackageCompressionLevel=normal
 
+      # Coverage is collected with the profiler based collector that ships with the test SDK.
+      # Coverlet rewrites the IL of the assemblies it instruments, which invalidates the strong
+      # name of TwinCAT.ProductivityTools.Core and makes every test that touches it fail on
+      # .NET Framework with a FileLoadException.
       - name: Test
         run: >
           dotnet test tests/TwinCAT.ProductivityTools.Core.Tests/TwinCAT.ProductivityTools.Core.Tests.csproj
           --configuration Release
           --no-restore
           --logger "trx;LogFileName=core.trx"
-          --collect:"XPlat Code Coverage"
+          --collect:"Code Coverage;Format=Cobertura"
           --results-directory artifacts/test-results
           --filter "Category!=E2E"
 
@@ -71,7 +75,7 @@ jobs:
           --configuration Release
           --no-restore
           --logger "trx;LogFileName=integration.trx"
-          --collect:"XPlat Code Coverage"
+          --collect:"Code Coverage;Format=Cobertura"
           --results-directory artifacts/test-results
           --filter "Category!=E2E"
 
@@ -79,9 +83,14 @@ jobs:
         if: always()
         uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
         with:
-          reports: artifacts/test-results/**/coverage.cobertura.xml
+          # The collector names the file after the agent and the run, so it cannot be matched by
+          # a fixed file name.
+          reports: artifacts/test-results/**/*.cobertura.xml
           targetdir: artifacts/coverage
           reporttypes: MarkdownSummaryGithub;Cobertura
+          # The collector also instruments the test assemblies themselves. Reporting them would
+          # inflate the figure with the coverage the tests trivially have of their own code.
+          assemblyfilters: -*.Tests
           title: TwinCAT.ProductivityTools
 
       - name: Publish coverage to the job summary

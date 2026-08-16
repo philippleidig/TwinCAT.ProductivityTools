@@ -122,7 +122,14 @@ an IDE with TwinCAT nor a desktop session.
 
 ```powershell
 dotnet test tests\TwinCAT.ProductivityTools.Core.Tests\TwinCAT.ProductivityTools.Core.Tests.csproj `
-    --collect:"XPlat Code Coverage"
+    --collect:"Code Coverage;Format=Cobertura"
 ```
 
 CI collects coverage for `Core` and `Integration` and writes a summary into the job summary.
+
+Use the profiler based collector shown above rather than coverlet's `XPlat Code Coverage`.
+Coverlet rewrites the IL of the assemblies it instruments, which invalidates the strong name of
+`TwinCAT.ProductivityTools.Core` — it is signed with `Key.snk` because the VSIX assemblies are
+signed and a signed assembly cannot reference an unsigned one. On .NET Framework the runtime
+verifies that signature on load, so every test touching `Core` then fails with
+`FileLoadException: Strong name signature could not be verified`.

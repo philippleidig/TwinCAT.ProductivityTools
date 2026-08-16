@@ -1,6 +1,4 @@
-![TwinCAT logo](https://github.com/philippleidig/TwinCAT.ProductivityTools/blob/main/assets/images/TwinCAT.bmp)
-
-# TwinCAT.ProductivityTools
+# <img src="assets/images/twincat.png" width="50"> TwinCAT.ProductivityTools
 
 [![CI](https://github.com/philippleidig/TwinCAT.ProductivityTools/actions/workflows/ci.yml/badge.svg)](https://github.com/philippleidig/TwinCAT.ProductivityTools/actions/workflows/ci.yml)
 [![Release](https://github.com/philippleidig/TwinCAT.ProductivityTools/actions/workflows/release.yml/badge.svg)](https://github.com/philippleidig/TwinCAT.ProductivityTools/actions/workflows/release.yml)
@@ -56,6 +54,11 @@ pick the environments to install into. Both routes are described in
 The full documentation index is in [docs/README.md](docs/README.md).
 
 ## Contributing
+
+Always excited to hear your ideas and improve this project together. If you have a feature in mind
+that you would like to see implemented, please open a GitHub issue at any time. To make things
+smoother, describe the feature and how it would enhance the project, and include examples, mockups
+or references if you have them.
 
 Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) and are the
 only version input — a push to `main` builds, tags and publishes a release on its own. See

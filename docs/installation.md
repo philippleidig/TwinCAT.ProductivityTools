@@ -53,11 +53,38 @@ wide configuration:
     --source https://nuget.pkg.github.com/philippleidig/index.json `
     --user <your-github-username> `
     --password-stdin `
-    --priority 7
+    --priority 7 `
+    --take 100
 ```
 
 The Beckhoff feeds occupy priorities 1 to 6, so 7 keeps this source below them and leaves the
 resolution of TwinCAT's own packages untouched. Verify it with `tcpkg source list`.
+
+#### `--take 100` is not optional
+
+Leaving it out makes the command fail:
+
+```
+Error: Failed to retrieve metadata from source
+'https://nuget.pkg.github.com/<owner>/query?q=&skip=0&take=500&prerelease=false&packageTypeFilter=Disclaimer&semVerLevel=2.0.0'
+```
+
+`tcpkg` asks every new source for its packages, and the page size it uses comes from `DefaultTake`
+in `C:\ProgramData\Beckhoff\TcPkg\appsettings.json`, which ships as `500`. **GitHub Packages caps
+the page size of its search endpoint at 100** and answers anything above it with `400 Bad Request`.
+Measured against the live registry:
+
+| `take` | Response |
+| --- | --- |
+| 20, 50, 100 | `200 OK` |
+| 101 and above | `400 Bad Request` |
+
+The Beckhoff feeds accept 500, which is why the default goes unnoticed until a GitHub source is
+added. `--take` is stored per source, so this only affects the GitHub entry.
+
+Two things this error is *not*, despite what it looks like: it is not the `packageTypeFilter`
+parameter, which GitHub accepts and ignores, and it is not an authentication problem. A missing
+`read:packages` scope produces `401`/`403` instead, with an explicit message about the token.
 
 ### Installing
 

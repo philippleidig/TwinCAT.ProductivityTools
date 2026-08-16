@@ -79,7 +79,18 @@ jobs:
           PRODUCTIVITYTOOLS_VERSION: ${{ steps.stamp.outputs.version }}
         run: |
           choco install innosetup --no-progress --yes
-          & "$env:ProgramFiles(x86)\Inno Setup 6\iscc.exe" setup\TwinCAT.ProductivityTools.iss
+
+          # The braces are required. "$env:ProgramFiles(x86)" expands $env:ProgramFiles and then
+          # appends a literal "(x86)", which yields "C:\Program Files(x86)" without the space.
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\iscc.exe"
+          if (-not (Test-Path $iscc)) {
+            throw "The Inno Setup compiler was not found at $iscc"
+          }
+
+          & $iscc setup\TwinCAT.ProductivityTools.iss
+          if ($LASTEXITCODE -ne 0) {
+            throw "The Inno Setup compiler failed with exit code $LASTEXITCODE"
+          }
 
       - name: Pack the TcPkg packages
         shell: pwsh
@@ -96,7 +107,13 @@ jobs:
             Copy-Item -Destination artifacts/release
           Get-ChildItem -Path artifacts/tcpkg -Filter *.nupkg -ErrorAction SilentlyContinue |
             Copy-Item -Destination artifacts/release
-          Get-ChildItem artifacts/release | Format-Table Name, Length
+
+          $assets = @(Get-ChildItem artifacts/release)
+          if ($assets.Count -eq 0) {
+            throw 'No release assets were collected.'
+          }
+
+          $assets | Format-Table Name, Length
 
       - name: Upload the assets as a workflow artifact
         uses: actions/upload-artifact@v4
@@ -120,8 +137,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $source = "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          $packages = Get-ChildItem -Path artifacts/tcpkg -Filter *.nupkg -ErrorAction SilentlyContinue
+          $packages = @(Get-ChildItem -Path artifacts/tcpkg -Filter *.nupkg -ErrorAction SilentlyContinue)
 
+          if ($packages.Count -eq 0) {
+            throw 'No packages were produced, so there is nothing to publish.'
+          }
+
+          # Without the explicit check a failed push in the middle of the loop would be masked by
+          # the next iteration and the feed would end up incomplete while the run stays green.
           foreach ($package in $packages) {
             dotnet nuget push $package.FullName --source $source --api-key $env:GITHUB_TOKEN --skip-duplicate
+            if ($LASTEXITCODE -ne 0) {
+              throw "Publishing $($package.Name) failed with exit code $LASTEXITCODE"
+            }
           }

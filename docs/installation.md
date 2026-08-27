@@ -88,6 +88,17 @@ parameter, which GitHub accepts and ignores, and it is not an authentication pro
 
 ### Installing
 
+`tcpkg` refuses to install an integration package for an environment whose integration is not
+enabled in its own configuration, with `The integration for VS2022 is not enabled`. Enable the ones
+that are on the machine first — `tcpkg config list` shows the current state:
+
+```powershell
+tcpkg config set -n useVS2022
+tcpkg config set -n useTcXaeShell64
+```
+
+Then, from an elevated PowerShell:
+
 ```powershell
 tcpkg install TwinCAT.ProductivityTools
 ```
@@ -98,18 +109,53 @@ That pulls in the whole set:
 | --- | --- |
 | `TwinCAT.ProductivityTools` | The workload itself |
 | `TwinCAT.ProductivityTools.Config` | PLC project template, matched to the installed TwinCAT build |
-| `TwinCAT.ProductivityTools.XAE` | Meta package for the engineering integration |
+| `TwinCAT.ProductivityTools.XAE` | Base package of the engineering integration, no payload |
 | `TwinCAT.ProductivityTools.XAE.TcXaeShell` | TcXaeShell, 32 bit |
 | `TwinCAT.ProductivityTools.XAE.TcXaeShell64` | TcXaeShell, 64 bit |
 | `TwinCAT.ProductivityTools.XAE.VS2022` | Visual Studio 2022, any edition |
 | `TwinCAT.ProductivityTools.XAE.VS2026` | Visual Studio 2026, any edition |
 
 Every integration package resolves the IDE it belongs to at install time through `vswhere`, and
-does nothing when that IDE is not on the machine. Installing a single environment works as well:
+does nothing when that IDE is not on the machine.
+
+### How the packages are layered
+
+`tcpkg` does not build its dependency graph from the nuspec files alone. A package id that ends in
+the name of an engineering environment — `.TcXaeShell`, `.TcXaeShell64`, `.VS2022`, `.VS2026` — is
+read as the integration of the package that remains when that suffix is removed, and `tcpkg` adds
+that edge itself:
+
+```
+TwinCAT.ProductivityTools                    (workload)
+ ├─ TwinCAT.ProductivityTools.Config
+ ├─ TwinCAT.ProductivityTools.XAE            (base, depends on TwinCAT.XAE.Base only)
+ ├─ TwinCAT.ProductivityTools.XAE.TcXaeShell     ─┐
+ ├─ TwinCAT.ProductivityTools.XAE.TcXaeShell64   ─┤ tcpkg adds an edge from each of these
+ ├─ TwinCAT.ProductivityTools.XAE.VS2022         ─┤ back to TwinCAT.ProductivityTools.XAE
+ └─ TwinCAT.ProductivityTools.XAE.VS2026         ─┘
+```
+
+**`TwinCAT.ProductivityTools.XAE` must therefore never depend on one of its own `.XAE.<environment>`
+packages.** Up to 1.1.11 it did, which closed the loop and made the install fail before it started:
+
+```
+Error: Circular dependency detected 'twincat.productivitytools 1.1.11
+       => twincat.productivitytools.xae 1.1.11
+       => twincat.productivitytools.xae.tcxaeshell 1.1.11
+       => twincat.productivitytools.xae 1.1.11'.
+```
+
+The workload owns the integration dependencies instead. `build/Test-TcPkgDependencies.ps1` rebuilds
+this graph, including the edges `tcpkg` derives from the ids, and fails the build on a cycle — a
+plain review of the nuspec files does not catch it, because they are acyclic on their own.
+
+Because every integration hangs off the same base, installing a single one pulls the whole set in:
 
 ```powershell
 tcpkg install TwinCAT.ProductivityTools.XAE.VS2022
 ```
+
+installs `…XAE` and all four integrations. Only the ones whose IDE is present do any work.
 
 Removing the workload removes the extension and the template again:
 

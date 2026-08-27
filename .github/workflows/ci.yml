@@ -48,6 +48,12 @@ jobs:
       - name: Check formatting
         run: dotnet csharpier --check .
 
+      # The nuspec files on their own are acyclic, so a review does not catch the cycle that TcPkg
+      # derives from the package ids. That is what broke "tcpkg install" for 1.1.11.
+      - name: Check the TcPkg dependency graph
+        run: ./build/Test-TcPkgDependencies.ps1
+        shell: pwsh
+
       - name: Stamp version
         run: ./build/Set-Version.ps1 -Version '${{ steps.gitversion.outputs.assemblySemVer }}'
         shell: pwsh

@@ -15,9 +15,21 @@
     <packageTypes>
       <packageType name="Workload" />
     </packageTypes>
+    <!--
+      The per IDE integration packages are listed here and not on TwinCAT.ProductivityTools.XAE.
+      TcPkg reads an id that ends in the name of an engineering environment as the integration of
+      the package that remains when that suffix is removed, and adds the edge
+      TwinCAT.ProductivityTools.XAE.TcXaeShell => TwinCAT.ProductivityTools.XAE by itself. A
+      dependency in the other direction would close that loop, which is what made
+      "tcpkg install TwinCAT.ProductivityTools" fail with a circular dependency up to 1.1.11.
+    -->
     <dependencies>
       <dependency id="TwinCAT.ProductivityTools.Config" version="[0.0.0,)" />
       <dependency id="TwinCAT.ProductivityTools.XAE" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.TcXaeShell" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.TcXaeShell64" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.VS2022" version="[0.0.0,)" />
+      <dependency id="TwinCAT.ProductivityTools.XAE.VS2026" version="[0.0.0,)" />
     </dependencies>
   </metadata>
   <files>

@@ -3,21 +3,22 @@
   <metadata>
     <id>TwinCAT.ProductivityTools.XAE</id>
     <version>0.0.0</version>
-    <title>TwinCAT Productivity Tools - XAE integration</title>
+    <title>TwinCAT Productivity Tools - XAE base</title>
     <authors>Philipp Leidig</authors>
     <projectUrl>https://github.com/philippleidig/TwinCAT.ProductivityTools</projectUrl>
     <license type="expression">MIT</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <icon>icon.png</icon>
     <tags>TwinCAT TCXAESHELL TCXAESHELL64 VS2022 VS2026</tags>
-    <summary>Meta package that pulls in the integration for every installed engineering environment.</summary>
-    <description>Meta package of the TwinCAT Productivity Tools. It depends on the integration packages for TcXaeShell, TcXaeShell 64 bit, Visual Studio 2022 and Visual Studio 2026. Each of those packages is a no-op when the matching environment is not installed.</description>
+    <summary>Base package of the engineering integration.</summary>
+    <description>Base package of the TwinCAT Productivity Tools integration for the engineering environments. It holds no payload. TcPkg links every TwinCAT.ProductivityTools.XAE.&lt;environment&gt; package to this one automatically, so the per environment packages must not be listed as dependencies here - that would form a circular dependency. The workload TwinCAT.ProductivityTools pulls them in instead.</description>
+    <!--
+      Must stay free of any TwinCAT.ProductivityTools.XAE.* dependency. TcPkg derives the edge
+      TwinCAT.ProductivityTools.XAE.<environment> => TwinCAT.ProductivityTools.XAE from the package
+      id alone, so a dependency in the other direction is a cycle. See the workload nuspec.
+    -->
     <dependencies>
       <dependency id="TwinCAT.XAE.Base" version="0.0.0" />
-      <dependency id="TwinCAT.ProductivityTools.XAE.TcXaeShell" version="[0.0.0,)" />
-      <dependency id="TwinCAT.ProductivityTools.XAE.TcXaeShell64" version="[0.0.0,)" />
-      <dependency id="TwinCAT.ProductivityTools.XAE.VS2022" version="[0.0.0,)" />
-      <dependency id="TwinCAT.ProductivityTools.XAE.VS2026" version="[0.0.0,)" />
     </dependencies>
   </metadata>
   <files>

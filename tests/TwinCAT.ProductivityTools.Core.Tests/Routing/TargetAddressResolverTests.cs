@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using NSubstitute;
 using TwinCAT.ProductivityTools.Routing;
@@ -38,21 +36,64 @@ namespace TwinCAT.ProductivityTools.Tests.Routing
 		}
 
 		[Fact]
-		public void Derives_the_address_from_the_net_id_when_no_route_matches()
+		public void Trims_the_address_of_a_route()
 		{
-			// TwinCAT builds the AmsNetID of a system from its IPv4 address plus ".1.1", so the
-			// first four octets are a usable address for a target that was never added as a
-			// static route.
-			new TargetAddressResolver(Reader())
-				.Resolve("192.168.10.20.1.1")
-				.Should()
-				.Be("192.168.10.20");
+			IRouteReader reader = Reader(
+				new TcConfigRoute { NetId = "5.24.13.37.1.1", Address = "  10.0.0.5  " }
+			);
+
+			new TargetAddressResolver(reader).Resolve("5.24.13.37.1.1").Should().Be("10.0.0.5");
 		}
 
 		[Fact]
-		public void Returns_nothing_for_a_net_id_that_is_not_an_address()
+		public void Uses_the_name_of_a_route_that_carries_no_address()
 		{
-			new TargetAddressResolver(Reader()).Resolve("5.24.300.37.1.1").Should().BeNull();
+			// The name is what the user typed into the route dialog, which is normally the host
+			// name of the target and resolves just as well.
+			IRouteReader reader = Reader(
+				new TcConfigRoute
+				{
+					NetId = "5.24.13.37.1.1",
+					Address = "",
+					Name = "CX-2A0D25",
+				}
+			);
+
+			new TargetAddressResolver(reader).Resolve("5.24.13.37.1.1").Should().Be("CX-2A0D25");
+		}
+
+		[Fact]
+		public void Never_derives_an_address_from_the_net_id()
+		{
+			// TwinCAT generates the AmsNetID of a system from the MAC address of an adapter, so
+			// 5.24.13.37.1.1 does not describe 5.24.13.37 - an address in public, routable space
+			// that belongs to somebody else. Guessing here used to send remote desktop there.
+			new TargetAddressResolver(Reader()).Resolve("5.24.13.37.1.1").Should().BeNull();
+		}
+
+		[Fact]
+		public void Reports_nothing_when_no_route_matches()
+		{
+			IRouteReader reader = Reader(
+				new TcConfigRoute { NetId = "10.0.0.5.1.1", Address = "10.0.0.5" }
+			);
+
+			new TargetAddressResolver(reader).Resolve("192.168.10.20.1.1").Should().BeNull();
+		}
+
+		[Fact]
+		public void Reports_nothing_for_a_route_that_names_nothing_at_all()
+		{
+			IRouteReader reader = Reader(
+				new TcConfigRoute
+				{
+					NetId = "192.168.1.1.1.1",
+					Address = "",
+					Name = "",
+				}
+			);
+
+			new TargetAddressResolver(reader).Resolve("192.168.1.1.1.1").Should().BeNull();
 		}
 
 		[Theory]
@@ -66,22 +107,12 @@ namespace TwinCAT.ProductivityTools.Tests.Routing
 		}
 
 		[Fact]
-		public void Falls_back_when_the_route_file_cannot_be_read()
+		public void Reports_nothing_when_the_route_file_cannot_be_read()
 		{
 			IRouteReader reader = Substitute.For<IRouteReader>();
 			reader.ListRoutes().Returns(_ => throw new System.IO.IOException());
 
-			new TargetAddressResolver(reader).Resolve("192.168.1.1.1.1").Should().Be("192.168.1.1");
-		}
-
-		[Fact]
-		public void Ignores_a_route_without_an_address()
-		{
-			IRouteReader reader = Reader(
-				new TcConfigRoute { NetId = "192.168.1.1.1.1", Address = "" }
-			);
-
-			new TargetAddressResolver(reader).Resolve("192.168.1.1.1.1").Should().Be("192.168.1.1");
+			new TargetAddressResolver(reader).Resolve("192.168.1.1.1.1").Should().BeNull();
 		}
 	}
 }

@@ -40,6 +40,14 @@ namespace TwinCAT.ProductivityTools.Integration.Tests.Services
 				.BeEmpty();
 		}
 
+		[Fact]
+		public void TheSshUserNameDefaultsToTheAccountEveryBeckhoffImageShips()
+		{
+			// A blank default would make the connect command build "ssh @10.0.0.5" on its first
+			// use, so the setting starts out with the account the images actually carry.
+			new General().SshUserName.Should().Be("Administrator");
+		}
+
 		[Theory]
 		[InlineData(typeof(General))]
 		[InlineData(typeof(Options.Build))]

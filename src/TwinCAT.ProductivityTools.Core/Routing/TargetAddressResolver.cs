@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
-using System.Net;
 
 namespace TwinCAT.ProductivityTools.Routing
 {
 	/// <summary>
-	/// Finds the IP address that belongs to an AmsNetID.
+	/// Finds the address that belongs to an AmsNetID.
 	/// </summary>
 	public sealed class TargetAddressResolver
 	{
@@ -20,12 +19,18 @@ namespace TwinCAT.ProductivityTools.Routing
 		}
 
 		/// <summary>
-		/// Prefers the address of a configured route, because a route may point at a host name or
-		/// at an address that has nothing to do with the AmsNetID. When no route matches, the
-		/// first four octets are used - deriving the address that way is the convention TwinCAT
-		/// itself follows when it generates an AmsNetID for a network adapter.
+		/// Returns the address of the route that belongs to the AmsNetID, falling back to the name
+		/// of that route, or <c>null</c> when no route names the target.
 		/// </summary>
-		/// <returns>The address, or <c>null</c> when none could be determined.</returns>
+		/// <remarks>
+		/// The route is the only place that knows the address of a target. An AmsNetID looks like
+		/// one - it has four leading octets that parse as IPv4 - but for every AmsNetID TwinCAT
+		/// generates itself those octets come from the MAC address of an adapter. Deriving an
+		/// address from them, as this class used to do, sent remote desktop to a machine that has
+		/// nothing to do with the target: <c>5.24.13.37.1.1</c> would become <c>5.24.13.37</c>,
+		/// which is public, routable address space belonging to somebody else. A target the user
+		/// can reach has a route; a target without one gets an error message that says so.
+		/// </remarks>
 		public string Resolve(string amsNetId)
 		{
 			if (string.IsNullOrWhiteSpace(amsNetId))
@@ -33,26 +38,27 @@ namespace TwinCAT.ProductivityTools.Routing
 				return null;
 			}
 
-			string fromRoute = FromRoute(amsNetId);
-
-			return string.IsNullOrWhiteSpace(fromRoute) ? FromNetId(amsNetId) : fromRoute;
+			return FromRoute(amsNetId);
 		}
 
 		private string FromRoute(string amsNetId)
 		{
 			try
 			{
-				return routeReader
+				TcConfigRoute route = routeReader
 					.ListRoutes()
 					?.FirstOrDefault(
-						route =>
+						candidate =>
 							string.Equals(
-								route?.NetId,
+								candidate?.NetId,
 								amsNetId,
 								StringComparison.OrdinalIgnoreCase
 							)
-					)
-					?.Address;
+					);
+
+				// A route without an address still names the target, and that name is what the
+				// user typed into the route dialog - normally a resolvable host name.
+				return route == null ? null : FirstUsable(route.Address, route.Name);
 			}
 			catch (Exception)
 			{
@@ -60,26 +66,11 @@ namespace TwinCAT.ProductivityTools.Routing
 			}
 		}
 
-		/// <summary>
-		/// The first four octets of an AmsNetID form an IPv4 address for every AmsNetID TwinCAT
-		/// derives from an adapter. Only a syntactically valid address is returned.
-		/// </summary>
-		public static string FromNetId(string amsNetId)
+		private static string FirstUsable(params string[] candidates)
 		{
-			string[] parts = amsNetId?.Split('.');
-
-			if (parts == null || parts.Length != 6)
-			{
-				return null;
-			}
-
-			string candidate = string.Join(".", parts.Take(4));
-
-			return
-				IPAddress.TryParse(candidate, out IPAddress address)
-				&& address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
-				? candidate
-				: null;
+			return candidates
+				.FirstOrDefault(candidate => !string.IsNullOrWhiteSpace(candidate))
+				?.Trim();
 		}
 	}
 }

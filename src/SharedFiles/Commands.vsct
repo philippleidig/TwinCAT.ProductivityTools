@@ -91,20 +91,33 @@
         </Strings>
       </Button>
 
-      <!-- Remote Desktop -->
-      <Button guid="ProductivityToolsCmdSet" id="RemoteDesktopCommandId" priority="0x0004" type="Button">
+      <!-- Connect to Target -->
+      <Button guid="ProductivityToolsCmdSet" id="ConnectToTargetCommandId" priority="0x0004" type="Button">
         <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
         <Icon guid="CommandImages" id="RemoteDesktopMoniker" />
         <CommandFlag>DefaultDisabled</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open Remote Desktop</ButtonText>
+          <ButtonText>Connect to Target</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- Beckhoff Device Manager -->
+      <Button guid="ProductivityToolsCmdSet" id="DeviceManagerCommandId" priority="0x0005" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="Settings" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Open Device Manager</ButtonText>
         </Strings>
       </Button>
       
       <!-- Realtime Ethernet Compatible Devices -->
-      <Button guid="ProductivityToolsCmdSet" id="RteInstallCommandId" priority="0x0005" type="Button">
+      <Button guid="ProductivityToolsCmdSet" id="RteInstallCommandId" priority="0x0006" type="Button">
         <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
               <Icon guid="CommandImages" id="DownloadMoniker" />
         <CommandFlag>DefaultDisabled</CommandFlag>
@@ -116,7 +129,7 @@
       </Button>
 
       <!-- Windows Set Tick -->
-      <Button guid="ProductivityToolsCmdSet" id="SetTickCommandId" priority="0x0006" type="Button">
+      <Button guid="ProductivityToolsCmdSet" id="SetTickCommandId" priority="0x0007" type="Button">
         <Parent guid="ProductivityToolsCmdSet" id="ProductivityToolsCommandsGroup" />
         <CommandFlag>DefaultDisabled</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -148,14 +161,25 @@
           <ButtonText>Reboot</ButtonText>
         </Strings>
       </Button>
-      <!-- Remote Desktop -->
-      <Button guid="ProductivityToolsCmdSet" id="RemoteDesktopCommandId" priority="0x0100" type="Button">
+      <!-- Connect to Target -->
+      <Button guid="ProductivityToolsCmdSet" id="ConnectToTargetCommandId" priority="0x0100" type="Button">
         <Parent guid="ProductivityToolsCmdSet" id="ToolbarGroup" />
               <Icon guid="CommandImages" id="RemoteDesktopMoniker" />
         <CommandFlag>DefaultDisabled</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Remote Desktop</ButtonText>
+          <ButtonText>Connect to Target</ButtonText>
+        </Strings>
+      </Button>
+      <!-- Beckhoff Device Manager -->
+      <Button guid="ProductivityToolsCmdSet" id="DeviceManagerCommandId" priority="0x0100" type="Button">
+        <Parent guid="ProductivityToolsCmdSet" id="ToolbarGroup" />
+              <Icon guid="ImageCatalogGuid" id="Settings" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Device Manager</ButtonText>
         </Strings>
       </Button>
 
@@ -371,9 +395,10 @@
         <IDSymbol name="ShutdownCommandId" value="0x0100" />
         <IDSymbol name="RebootCommandId" value="0x0101" />
         <IDSymbol name="DeviceInfoCommandId" value="0x0102" />
-        <IDSymbol name="RemoteDesktopCommandId" value="0x0103" />
+        <IDSymbol name="ConnectToTargetCommandId" value="0x0103" />
         <IDSymbol name="RteInstallCommandId" value="0x0104" />
         <IDSymbol name="SetTickCommandId" value="0x0105" />
+        <IDSymbol name="DeviceManagerCommandId" value="0x0106" />
         <IDSymbol name="RemoveCommentsCommandId" value="0x0110" />
         <IDSymbol name="RemoveRegionsCommandId" value="0x0120"/>
         <IDSymbol name="OpenInVsCodeCommandId" value="0x0210" />

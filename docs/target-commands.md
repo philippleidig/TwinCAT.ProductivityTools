@@ -1,10 +1,10 @@
 # Target commands
 
-Six commands act on the **target system** of the active TwinCAT project — the machine the project
+Seven commands act on the **target system** of the active TwinCAT project — the machine the project
 is configured to run on, not the engineering station.
 
-**Where** — **Tools ▸ TwinCAT Productivity Tools**. Shutdown, Reboot and Remote Desktop are also
-on the **TwinCAT Productivity Tools** toolbar.
+**Where** — **Tools ▸ TwinCAT Productivity Tools**. Shutdown, Reboot, Connect to Target and
+Device Manager are also on the **TwinCAT Productivity Tools** toolbar.
 
 ![The Tools menu with the submenu open](images/tools-menu.png)
 
@@ -17,7 +17,7 @@ Every one of these commands resolves the target the same way:
 3. Destructive commands ask for confirmation, naming the target.
 4. The result goes to the status bar; a failure goes to the output window with its exception.
 
-All six are hidden while the solution has no active TwinCAT project or the project has no valid
+All seven are hidden while the solution has no active TwinCAT project or the project has no valid
 target AmsNetID. That is deliberate: a target command without a target is a command that can only
 fail.
 
@@ -66,14 +66,55 @@ afterwards.
 
 ---
 
-## Open Remote Desktop
+## Connect to Target
 
-Opens a Windows remote desktop session to the target.
+Opens an interactive session on the target, choosing how by the operating system the target runs.
 
-The IP address is resolved from the route of the target, so the command works with the name the
+| Operating system of the target | Session |
+| --- | --- |
+| Windows (10 IoT, Embedded Standard, …) | Remote desktop, through `mstsc.exe` |
+| TwinCAT/BSD, TwinCAT/Linux | SSH in a new console window, through the Windows OpenSSH client |
+| Windows CE | Neither — CE serves no remote session. Use [Open Device Manager](#open-device-manager). |
+| Could not be determined | The command asks which of the two to use |
+
+The address is resolved from the route of the target, so the command works with the name the
 project uses and does not need the address to be typed. When no address can be determined — an
-unrouted target, or a route without an address — the command says so instead of opening an empty
-session.
+unrouted target, or a route with neither an address nor a name — the command says so instead of
+opening an empty session.
+
+The SSH user name is a setting, see [Options](options.md#general). It starts out as
+`Administrator`, the account every Beckhoff image ships, and the extension connects as
+`<user>@<address>`.
+
+### Notes and limitations
+
+* The operating system is read from the target over ADS. An offline target cannot answer, which is
+  why the command asks instead of guessing — guessing Windows would open a remote desktop session
+  on a TwinCAT/BSD machine that has no server to answer it.
+* SSH uses the OpenSSH client that comes with Windows. When it is missing, install it under
+  **Settings ▸ Apps ▸ Optional features ▸ OpenSSH Client**.
+* The address is never derived from the AmsNetID. An AmsNetID that TwinCAT generated itself looks
+  like `5.24.13.37.1.1` and its first four octets come from a MAC address, not from an address of
+  the target. Earlier versions used them anyway, which sent the session to a public address on the
+  internet that belongs to somebody else. A target without a route now gets an error message.
+
+---
+
+## Open Device Manager
+
+Opens the Beckhoff Device Manager of the target, `https://<address>/config`, in the default
+browser.
+
+The Device Manager is the web interface of a Beckhoff image. It configures what is not part of the
+TwinCAT project — network, users, the write filter, the software watchdog — and on a Windows CE
+target it is the only way to configure the machine remotely.
+
+### Notes and limitations
+
+* The address is resolved the same way as for [Connect to Target](#connect-to-target).
+* The Device Manager uses a self signed certificate, so the browser warns before it shows the page.
+  That warning is expected.
+* Not every image ships the Device Manager. A plain PC without a Beckhoff image does not answer.
 
 ---
 

@@ -16,7 +16,7 @@ where you already are: the context menu of the item you selected, or the
 | [XAE project commands](project-commands.md) | Relative AmsNetIDs, logged events, build artifact cleanup |
 | [PLC commands](plc-commands.md) | Removing comments and regions, opening in VS Code or Explorer |
 | [I/O commands](io-commands.md) | Enabling the ADS server, the I/O mapping window |
-| [Target commands](target-commands.md) | Shutdown, reboot, device info, remote desktop, real time driver, tick |
+| [Target commands](target-commands.md) | Shutdown, reboot, device info, remote desktop and SSH, the Device Manager, real time driver, tick |
 | [Options](options.md) | Everything under Tools ▸ Options |
 | [PLC project template](plc-templates.md) | "Standard PLC Project Optimized Defaults" |
 
@@ -29,8 +29,8 @@ where you already are: the context menu of the item you selected, or the
 | Context menu of a PLC folder | Open in Visual Studio Code · Open in File Explorer |
 | Context menu of an EtherCAT master | Enable ADS Server |
 | Context menu of an I/O mapping | Show IO Mappings |
-| **Tools ▸ TwinCAT Productivity Tools** | Shutdown · Reboot · Device Info · Open Remote Desktop · Show Realtime Ethernet Compatible Devices · Windows Set Tick |
-| **TwinCAT Productivity Tools** toolbar | Shutdown · Reboot · Remote Desktop |
+| **Tools ▸ TwinCAT Productivity Tools** | Shutdown · Reboot · Device Info · Connect to Target · Open Device Manager · Show Realtime Ethernet Compatible Devices · Windows Set Tick |
+| **TwinCAT Productivity Tools** toolbar | Shutdown · Reboot · Connect to Target · Device Manager |
 
 Every command is hidden while it cannot do anything. A command that needs an active TwinCAT XAE
 project does not appear in a solution without one, and a command that needs a target AmsNetID does

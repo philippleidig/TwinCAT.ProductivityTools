@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
 using TwinCAT.ProductivityTools.Abstractions;
+using TwinCAT.ProductivityTools.Remote;
 
 namespace TwinCAT.ProductivityTools.Infrastructure
 {
@@ -59,6 +61,31 @@ namespace TwinCAT.ProductivityTools.Infrastructure
 			{
 				return Enumerable.Empty<string>();
 			}
+		}
+	}
+
+	/// <inheritdoc cref="IProcessLauncher"/>
+	public sealed class SystemProcessLauncher : IProcessLauncher
+	{
+		public static readonly SystemProcessLauncher Instance = new SystemProcessLauncher();
+
+		public void Start(ProcessLaunch launch)
+		{
+			if (launch == null)
+			{
+				throw new ArgumentNullException(nameof(launch));
+			}
+
+			ProcessStartInfo start = new ProcessStartInfo
+			{
+				FileName = launch.FileName,
+				Arguments = launch.Arguments,
+				UseShellExecute = launch.UseShellExecute,
+			};
+
+			// Only the handle of the started process is disposed here. The process itself outlives
+			// the extension - that is the point of starting it.
+			using (Process.Start(start)) { }
 		}
 	}
 }

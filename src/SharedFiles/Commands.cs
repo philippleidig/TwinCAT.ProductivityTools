@@ -44,9 +44,10 @@ namespace TwinCAT.ProductivityTools
         public const int ShutdownCommandId = 0x0100;
         public const int RebootCommandId = 0x0101;
         public const int DeviceInfoCommandId = 0x0102;
-        public const int RemoteDesktopCommandId = 0x0103;
+        public const int ConnectToTargetCommandId = 0x0103;
         public const int RteInstallCommandId = 0x0104;
         public const int SetTickCommandId = 0x0105;
+        public const int DeviceManagerCommandId = 0x0106;
         public const int RemoveCommentsCommandId = 0x0110;
         public const int RemoveRegionsCommandId = 0x0120;
         public const int OpenInVsCodeCommandId = 0x0210;

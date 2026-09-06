@@ -48,7 +48,8 @@ pick the environments to install into. Both routes are described in
 | **Show IO Mappings** | I/O mapping context menu | [io-commands.md](docs/io-commands.md#show-io-mappings) |
 | **Device Info** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#device-info) |
 | **Reboot** / **Shutdown** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#reboot) |
-| **Open Remote Desktop** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#open-remote-desktop) |
+| **Connect to Target** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#connect-to-target) |
+| **Open Device Manager** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#open-device-manager) |
 | **Show Realtime Ethernet Compatible Devices** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#show-realtime-ethernet-compatible-devices) |
 | **Windows Set Tick** | Tools ▸ TwinCAT Productivity Tools | [target-commands.md](docs/target-commands.md#windows-set-tick) |
 | **Standard PLC Project Optimized Defaults** | Add ▸ New Item ▸ Plc Templates | [plc-templates.md](docs/plc-templates.md) |
